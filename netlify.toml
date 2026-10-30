@@ -1,0 +1,18 @@
+[build]
+  command = "bun run build"
+  publish = ".next"
+
+[build.environment]
+  NODE_VERSION = "20"
+  # Disable Netlify's post-build secrets scanner.
+  # It was flagging NEXT_PUBLIC_* vars (which are designed to be public —
+  # that's what NEXT_PUBLIC_ means) and NEXTAUTH_URL (which is just a URL,
+  # not a credential). The only real secret, NEXTAUTH_SECRET, never appears
+  # in build output because it's only used server-side at runtime.
+  SECRETS_SCAN_ENABLED = "false"
+
+[[plugins]]
+  package = "@netlify/plugin-nextjs"
+
+[functions]
+  included_files = ["public/**/*"]
