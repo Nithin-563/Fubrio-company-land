@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import { canSessionAccess } from "@/lib/types";
-import { supabase } from "@/lib/supabase";
+import { serverSupabase as supabase } from "@/lib/supabase-admin";
 
 function rowToJson(r: any) {
   return {

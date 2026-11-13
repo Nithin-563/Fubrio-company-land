@@ -4,6 +4,7 @@ import "./globals.css";
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as SonnerToaster } from "@/components/ui/sonner";
 import { Providers } from "@/components/providers";
+import { CookieConsent } from "@/components/site/cookie-consent";
 
 const interTight = Inter_Tight({
   variable: "--font-inter-tight",
@@ -191,6 +192,7 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
         <Providers>
           {children}
         </Providers>
+        <CookieConsent />
         <Toaster />
         <SonnerToaster />
       </body>

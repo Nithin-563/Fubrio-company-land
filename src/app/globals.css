@@ -488,3 +488,20 @@
     scroll-behavior: auto !important;
   }
 }
+
+.input-line {
+  width: 100%;
+  background: transparent;
+  border: 0;
+  border-bottom: 1px solid var(--border);
+  border-radius: 0;
+  padding: 0.5rem 0;
+  font-size: 0.9375rem;
+  color: var(--foreground);
+  outline: none;
+  transition: border-color 0.15s ease;
+}
+.input-line:focus { border-color: var(--foreground); }
+.input-line::placeholder { color: var(--muted-foreground); opacity: 0.6; }
+select.input-line { appearance: none; }
+textarea.input-line { resize: vertical; min-height: 6rem; }

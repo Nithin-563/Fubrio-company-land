@@ -71,9 +71,40 @@ function normaliseProvider(raw: string | undefined): AiProvider {
   return "openai";
 }
 
+let scrubPromise: Promise<number> | null = null;
+
+/**
+ * Deletes any secret-looking ai.* row left in site_settings by the old admin
+ * form. Runs once per server process; failures are silent because the SQL
+ * migration does the same cleanup with admin rights.
+ */
+export function scrubStoredSecretSettings(): Promise<number> {
+  if (!scrubPromise) {
+    scrubPromise = (async () => {
+      try {
+        const { serverSupabase } = await import("@/lib/supabase-admin");
+        const { data } = await serverSupabase.from("site_settings").select("key");
+        const keys = (data ?? [])
+          .map((row: { key?: string }) => row.key)
+          .filter((key: string | undefined): key is string =>
+            typeof key === "string" && key.startsWith("ai.") && isSecretSettingKey(key),
+          );
+        if (keys.length === 0) return 0;
+        const { error } = await serverSupabase.from("site_settings").delete().in("key", keys);
+        if (error) return 0;
+        console.warn(`[ai-config] removed ${keys.length} stored secret setting row(s)`);
+        return keys.length;
+      } catch {
+        return 0;
+      }
+    })();
+  }
+  return scrubPromise;
+}
+
 async function readSettingsRows(): Promise<Record<string, string>> {
   try {
-    const { supabase } = await import("@/lib/supabase");
+    const { serverSupabase: supabase } = await import("@/lib/supabase-admin");
     const { data } = await supabase.from("site_settings").select("key, value");
     const out: Record<string, string> = {};
     for (const row of data ?? []) {
@@ -88,6 +119,7 @@ async function readSettingsRows(): Promise<Record<string, string>> {
 }
 
 export async function readAiSettings(): Promise<AiSettings> {
+  await scrubStoredSecretSettings();
   const settings = stripSecretSettings(await readSettingsRows());
   const provider = normaliseProvider(settings["ai.provider"] || process.env.AI_PROVIDER);
 

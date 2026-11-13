@@ -1,4 +1,4 @@
-import { supabase } from "@/lib/supabase";
+import { serverSupabase as supabase } from "@/lib/supabase-admin";
 import { logApiKeyEvent } from "@/lib/api-keys";
 
 

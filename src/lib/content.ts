@@ -159,11 +159,10 @@ export async function getSponsors(brand?: string) {
 }
 
 export async function getPartners(brand?: string) {
-  const where: Record<string, unknown> = {};
+  const where: Record<string, unknown> = { published: true };
   if (brand) where.brand = { in: [brand, "both"] };
   const rows = await db.partner.findMany({
     where,
-    where: { published: true },
     orderBy: [{ featured: "desc" }, { order: "asc" }, { createdAt: "desc" }],
   });
   return rows.map(serializePartner);
@@ -225,22 +224,20 @@ export async function getMetrics() {
 }
 
 export async function getFaqs(brand?: string) {
-  const where: Record<string, unknown> = {};
+  const where: Record<string, unknown> = { published: true };
   if (brand) where.brand = { in: [brand, "both"] };
   const rows = await db.faq.findMany({
     where,
-    where: { published: true },
     orderBy: [{ order: "asc" }, { createdAt: "asc" }],
   });
   return rows.map(serializeFaq);
 }
 
 export async function getEvents(limit = 5, brand?: string) {
-  const where: Record<string, unknown> = {};
+  const where: Record<string, unknown> = { status: "UPCOMING" };
   if (brand) where.brand = { in: [brand, "both"] };
   const rows = await db.event.findMany({
     where,
-    where: { status: "UPCOMING" },
     orderBy: [{ date: "asc" }],
     take: limit,
   });

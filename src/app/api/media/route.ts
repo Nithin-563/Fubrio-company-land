@@ -3,7 +3,7 @@ import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import { can } from "@/lib/types";
 import { db } from "@/lib/db";
-import { supabase } from "@/lib/supabase";
+import { serverSupabase as supabase } from "@/lib/supabase-admin";
 import { v4 as uuid } from "uuid";
 
 export async function POST(req: NextRequest) {

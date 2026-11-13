@@ -11,7 +11,7 @@ const schema = z.object({
   company: z.string().max(200).optional().nullable(),
   inquiryType: z.enum([
     "GENERAL", "PROJECT", "PARTNERSHIP", "SPONSORSHIP",
-    "SUPPORT", "COLLABORATION", "CAREERS", "OTHER",
+    "SUPPORT", "COLLABORATION", "CAREERS", "ADVERTISING", "OTHER",
   ]),
   budget: z.string().max(120).optional().nullable(),
   message: z.string().min(10, "Message must be at least 10 characters").max(5000),

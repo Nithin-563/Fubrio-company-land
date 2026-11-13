@@ -156,6 +156,18 @@ export function Footer({ columns, brand = FUBRIO_CONFIG }: { columns: Serialized
               Terms
             </button>
             <button
+              onClick={() => navigate("#cookies")}
+              className="font-mono text-[10px] uppercase tracking-[0.1em] text-muted-foreground transition-colors hover:text-foreground"
+            >
+              Cookies
+            </button>
+            <button
+              onClick={() => navigate("#advertise")}
+              className="font-mono text-[10px] uppercase tracking-[0.1em] text-muted-foreground transition-colors hover:text-foreground"
+            >
+              Advertise
+            </button>
+            <button
               onClick={() => navigate("#admin")}
               className="font-mono text-[10px] uppercase tracking-[0.1em] text-muted-foreground transition-colors hover:text-foreground"
             >

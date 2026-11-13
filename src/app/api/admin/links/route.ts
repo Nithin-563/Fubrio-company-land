@@ -4,7 +4,7 @@ import { authOptions } from "@/lib/auth";
 import { can } from "@/lib/types";
 import { db } from "@/lib/db";
 import { safeAuditLog } from "@/lib/audit";
-import { supabase } from "@/lib/supabase";
+import { serverSupabase as supabase } from "@/lib/supabase-admin";
 import { v4 as uuid } from "uuid";
 
 function slugify(s: string) {

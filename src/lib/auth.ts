@@ -4,7 +4,7 @@ import GoogleProvider from "next-auth/providers/google";
 import DiscordProvider from "next-auth/providers/discord";
 import { compare, hash } from "bcryptjs";
 import { db } from "@/lib/db";
-import { supabase } from "@/lib/supabase";
+import { serverSupabase as supabase } from "@/lib/supabase-admin";
 import { getMasterCzerCode, secretsMatch } from "@/lib/security";
 
 const CZER_CODE = getMasterCzerCode();

@@ -1,4 +1,5 @@
-import { supabase, isSupabaseConfigured } from "@/lib/supabase";
+import { serverSupabase as supabase } from "@/lib/supabase-admin";
+import { isSupabaseConfigured } from "@/lib/supabase";
 
 
 function snakeToCamel(s: string): string {

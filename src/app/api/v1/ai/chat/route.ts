@@ -138,7 +138,7 @@ export async function POST(req: NextRequest) {
     }
 
     try {
-      const { supabase } = await import("@/lib/supabase");
+      const { serverSupabase: supabase } = await import("@/lib/supabase-admin");
       await supabase
         .from("api_keys")
         .update({ last_used_at: new Date().toISOString() })

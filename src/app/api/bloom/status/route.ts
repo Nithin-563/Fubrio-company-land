@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { getBotStatus, isBotApiConfigured } from "@/lib/bloom-bot";
-import { supabase } from "@/lib/supabase";
+import { serverSupabase as supabase } from "@/lib/supabase-admin";
 
 export async function GET() {
   if (isBotApiConfigured()) {

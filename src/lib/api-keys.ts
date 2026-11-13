@@ -56,7 +56,7 @@ export async function verifyApiKey(rawKey: string): Promise<any | null> {
   else if (cleaned.startsWith("fubrio_ads_")) type = "ads";
   else return null;
 
-  const { supabase } = await import("@/lib/supabase");
+  const { serverSupabase: supabase } = await import("@/lib/supabase-admin");
   const { data: candidates, error } = await supabase
     .from("api_keys")
     .select("*")
@@ -105,7 +105,7 @@ async function compareHashes(plaintext: string, hash: string): Promise<boolean> 
 export const MAX_KEYS_PER_DAY = 3;
 
 export async function getDailyKeyCount(userId: string): Promise<number> {
-  const { supabase } = await import("@/lib/supabase");
+  const { serverSupabase: supabase } = await import("@/lib/supabase-admin");
   const startOfDay = new Date();
   startOfDay.setUTCHours(0, 0, 0, 0);
   const { count, error } = await supabase
@@ -128,7 +128,7 @@ export async function logApiKeyEvent(opts: {
   userAgent?: string;
 }) {
   try {
-    const { supabase } = await import("@/lib/supabase");
+    const { serverSupabase: supabase } = await import("@/lib/supabase-admin");
     await supabase.from("api_key_logs").insert({
       api_key_id: opts.apiKeyId ?? null,
       type: opts.type,

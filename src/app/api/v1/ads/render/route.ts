@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { verifyApiKey, logApiKeyEvent } from "@/lib/api-keys";
 import { checkRateLimitAds } from "@/lib/rate-limit";
-import { supabase } from "@/lib/supabase";
+import { serverSupabase as supabase } from "@/lib/supabase-admin";
 import { getBaseUrl } from "@/lib/base-url";
 import { v4 as uuid } from "uuid";
 

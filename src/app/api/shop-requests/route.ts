@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { z } from "zod";
 import { hasTriggeredHoneypot, createChatAccessToken } from "@/lib/security";
-import { supabase } from "@/lib/supabase";
+import { serverSupabase as supabase } from "@/lib/supabase-admin";
 import { createNotification } from "@/lib/notifications";
 
 const schema = z.object({

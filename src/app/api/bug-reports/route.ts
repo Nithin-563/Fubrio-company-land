@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { supabase } from "@/lib/supabase";
+import { serverSupabase as supabase } from "@/lib/supabase-admin";
 import { createNotification } from "@/lib/notifications";
 import { z } from "zod";
 import { hasTriggeredHoneypot } from "@/lib/security";

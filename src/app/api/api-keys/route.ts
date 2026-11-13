@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
-import { supabase } from "@/lib/supabase";
+import { serverSupabase as supabase } from "@/lib/supabase-admin";
 import { generateApiKey, getDailyKeyCount, MAX_KEYS_PER_DAY, logApiKeyEvent } from "@/lib/api-keys";
 
 export async function GET() {

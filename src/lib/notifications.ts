@@ -1,4 +1,4 @@
-import { supabase } from "@/lib/supabase";
+import { serverSupabase as supabase } from "@/lib/supabase-admin";
 
 
 export type NotificationType =

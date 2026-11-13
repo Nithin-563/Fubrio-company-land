@@ -171,11 +171,78 @@ export function BloomHomeView({ data, brand }: { data: PageData; brand: BrandCon
         </div>
       </section>
 
+      <section className="border-b border-border">
+        <div className="mx-auto max-w-[84rem] px-4 py-14 sm:px-6 sm:py-16 lg:px-8">
+          <ChapterHead
+            index="03"
+            label="Setup"
+            title="Three steps, no dashboard required"
+            description="Bloom runs on sensible defaults from the first minute. Configuration is there when you want it, not before."
+          />
+
+          <ol className="mt-8 grid gap-8 border-t border-border pt-6 sm:grid-cols-3 sm:gap-10">
+            {[
+              [
+                "Invite",
+                "Pick the server, review the permissions Bloom asks for, authorise. Only the modules you enable need them.",
+              ],
+              [
+                "Configure",
+                "Run /config for a guided pass over moderation, logging, welcome and tickets. It writes only what you change.",
+              ],
+              [
+                "Leave it alone",
+                "Defaults are conservative: log-only where a wrong action would be expensive, action where the signal is certain.",
+              ],
+            ].map(([title, body], i) => (
+              <li key={title}>
+                <Meta>{String(i + 1).padStart(2, "0")}</Meta>
+                <h3 className="mt-2 text-[1.0625rem]">{title}</h3>
+                <p className="mt-1.5 text-[13px] leading-relaxed text-muted-foreground">{body}</p>
+              </li>
+            ))}
+          </ol>
+        </div>
+      </section>
+
+      <section className="border-b border-border bg-secondary/30">
+        <div className="mx-auto max-w-[84rem] px-4 py-14 sm:px-6 sm:py-16 lg:px-8">
+          <div className="grid gap-8 lg:grid-cols-12 lg:gap-12">
+            <div className="lg:col-span-4">
+              <div className="eyebrow">Safety</div>
+              <h2 className="display-heading mt-2 text-[1.75rem] leading-tight">
+                Moderation you can undo.
+              </h2>
+              <p className="mt-3 text-[13px] leading-relaxed text-muted-foreground">
+                Every action is recorded as a case with the reason, the moderator and a jump link, so a
+                wrong call is one command away from being reversed.
+              </p>
+            </div>
+
+            <dl className="lg:col-span-8 lg:border-l lg:border-border lg:pl-12">
+              {[
+                ["Reversible first", "Timeouts before bans, and bans always carry a reason and a case id."],
+                ["Only what you enable", "No module acts in a channel until you turn it on for that server."],
+                ["No paid protection", "Anti-raid, anti-nuke and anti-spam are free. Safety is not a subscription."],
+              ].map(([title, body], i) => (
+                <div key={title} className="grid grid-cols-[1.75rem_1fr] gap-3 border-b border-border py-4 first:border-t">
+                  <Meta>{String(i + 1).padStart(2, "0")}</Meta>
+                  <div>
+                    <dt className="text-[0.9375rem]">{title}</dt>
+                    <dd className="mt-0.5 text-[13px] leading-relaxed text-muted-foreground">{body}</dd>
+                  </div>
+                </div>
+              ))}
+            </dl>
+          </div>
+        </div>
+      </section>
+
       {data.posts && data.posts.length > 0 && (
         <section className="border-b border-border">
           <div className="mx-auto max-w-[84rem] px-4 py-14 sm:px-6 sm:py-16 lg:px-8">
             <ChapterHead
-              index="03"
+              index="04"
               label="Journal"
               title="Release notes"
               action={
@@ -211,7 +278,7 @@ export function BloomHomeView({ data, brand }: { data: PageData; brand: BrandCon
         <section className="border-b border-border bg-secondary/30">
           <div className="mx-auto max-w-[84rem] px-4 py-14 sm:px-6 sm:py-16 lg:px-8">
             <ChapterHead
-              index="04"
+              index="05"
               label="Questions"
               title="Before you add it"
               action={

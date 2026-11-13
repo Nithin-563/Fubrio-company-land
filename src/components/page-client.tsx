@@ -40,6 +40,16 @@ const AdminRouter = dynamic(
   { loading: viewLoading, ssr: false },
 );
 
+const LegalView = dynamic(
+  () => import("@/components/site/legal-view").then((m) => m.LegalView),
+  { ssr: false },
+);
+
+const AdvertiseView = dynamic(
+  () => import("@/components/site/advertise-view").then((m) => m.AdvertiseView),
+  { ssr: false },
+);
+
 const CzerPanel = dynamic(
   () => import("@/components/admin/czer-panel").then((m) => m.CzerPanel),
   { loading: viewLoading, ssr: false },
@@ -145,6 +155,14 @@ export function PageClient({ data, brandId = "fubrio" }: { data: PageData; brand
 
   if (effectiveBase === "admin") {
     return <AdminRouter />;
+  }
+
+  if (effectiveBase === "terms" || effectiveBase === "privacy" || effectiveBase === "cookies") {
+    return <LegalView kind={effectiveBase} />;
+  }
+
+  if (effectiveBase === "advertise") {
+    return <AdvertiseView communityEmail={data.settings?.["email.community"]} />;
   }
 
   if (effectiveBase === "showcase" && effectiveSub) {
@@ -255,7 +273,7 @@ export function PageClient({ data, brandId = "fubrio" }: { data: PageData; brand
       {brand.isBloom ? (
         <BloomHomeView data={data} brand={brand} />
       ) : (
-        (effectiveBase === "home" || effectiveBase === "services" || effectiveBase === "partners" || effectiveBase === "sponsors" || effectiveBase === "community" || effectiveBase === "contact" || effectiveBase === "about" || effectiveBase === "careers" || effectiveBase === "changelog" || effectiveBase === "roadmap" || effectiveBase === "privacy" || effectiveBase === "terms") && (
+        (effectiveBase === "home" || effectiveBase === "services" || effectiveBase === "partners" || effectiveBase === "sponsors" || effectiveBase === "community" || effectiveBase === "contact" || effectiveBase === "about" || effectiveBase === "careers" || effectiveBase === "changelog" || effectiveBase === "roadmap") && (
           <HomeView data={data} brand={brand} />
         )
       )}

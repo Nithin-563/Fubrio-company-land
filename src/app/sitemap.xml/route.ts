@@ -21,6 +21,10 @@ const FUBRIO_ENTRIES: Entry[] = [
   { loc: "/#contact", changefreq: "monthly", priority: "0.5" },
   { loc: "/#about", changefreq: "monthly", priority: "0.4" },
   { loc: "/#team", changefreq: "monthly", priority: "0.4" },
+  { loc: "/#advertise", changefreq: "monthly", priority: "0.5" },
+  { loc: "/#terms", changefreq: "yearly", priority: "0.3" },
+  { loc: "/#privacy", changefreq: "yearly", priority: "0.3" },
+  { loc: "/#cookies", changefreq: "yearly", priority: "0.3" },
   { loc: "/#sponsors", changefreq: "monthly", priority: "0.4" },
 ];
 
