@@ -7,6 +7,7 @@ import { PageClient } from "@/components/page-client";
 import { isSupabaseConfigured } from "@/lib/supabase";
 import { db } from "@/lib/db";
 import { detectBrand, getBrandConfig } from "@/lib/brand";
+import { isPublicSettingKey } from "@/lib/ai-config";
 import { headers } from "next/headers";
 import { FubFindzStore } from "@/components/fubfindz-store";
 
@@ -146,10 +147,8 @@ NEXTAUTH_URL=http://localhost:3000`}</pre>
       const rows = await db.siteSetting.findMany();
       const out: Record<string, string> = {};
       for (const r of rows) {
-        if (r && r.key) {
-          if (r.key.startsWith("donation.") || r.key.startsWith("brand.") || r.key.startsWith("social.") || r.key.startsWith("seo.") || r.key.startsWith("email.") || r.key.startsWith("contact.")) {
-            out[r.key] = r.value;
-          }
+        if (r && r.key && isPublicSettingKey(r.key)) {
+          out[r.key] = r.value;
         }
       }
       return out;

@@ -383,7 +383,9 @@ ngrok http 3000
                 base URL and model are configured by the site owner in{" "}
                 <strong>Admin → Settings → AI API</strong>, so any OpenAI-compatible endpoint
                 (OpenAI, OpenRouter, Groq, Together, vLLM, Ollama), Gemini or Anthropic can sit
-                behind the same URL.
+                behind the same URL. The provider key lives only in the server environment
+                (<code className="font-mono bg-secondary px-1.5 py-0.5 rounded text-xs">AI_API_KEY</code>);
+                it is never stored in the database or sent to a browser.
               </P>
 
               <H3>Endpoint</H3>

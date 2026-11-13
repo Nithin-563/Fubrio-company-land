@@ -11,7 +11,7 @@ import { SectionHeader } from "@/components/admin/admin-shell";
 import { Skeleton } from "@/components/ui/skeleton";
 import { toast } from "sonner";
 
-const SETTING_GROUPS: Array<{ title: string; keys: Array<{ key: string; label: string; type?: "text" | "textarea" | "color"; placeholder?: string }> }> = [
+const SETTING_GROUPS: Array<{ title: string; note?: string; keys: Array<{ key: string; label: string; type?: "text" | "textarea" | "color"; placeholder?: string }> }> = [
   {
     title: "Branding",
     keys: [
@@ -64,11 +64,11 @@ const SETTING_GROUPS: Array<{ title: string; keys: Array<{ key: string; label: s
   },
   {
     title: "AI API",
+    note: "The provider key is read from the server environment as AI_API_KEY. It is never stored in the database, returned by an endpoint, or sent to the browser.",
     keys: [
       { key: "ai.provider", label: "Provider (openai | gemini | anthropic)", placeholder: "openai" },
       { key: "ai.baseUrl", label: "Base URL (any OpenAI-compatible endpoint)", placeholder: "https://api.openai.com/v1" },
       { key: "ai.model", label: "Model", placeholder: "gpt-4o-mini" },
-      { key: "ai.apiKey", label: "API key (stored server-side, never sent to the browser)" },
       { key: "ai.assistantName", label: "Assistant name", placeholder: "Fubrio Assistant" },
       { key: "ai.systemPrompt", label: "System prompt", type: "textarea" },
     ],
@@ -84,6 +84,7 @@ const SETTING_GROUPS: Array<{ title: string; keys: Array<{ key: string; label: s
 
 export function SettingsAdmin() {
   const [values, setValues] = useState<Record<string, string>>({});
+  const [aiKeyConfigured, setAiKeyConfigured] = useState<boolean | null>(null);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
 
@@ -92,7 +93,10 @@ export function SettingsAdmin() {
     try {
       const res = await fetch("/api/admin/settings");
       const json = await res.json();
-      if (json.ok) setValues(json.settings ?? {});
+      if (json.ok) {
+        setValues(json.settings ?? {});
+        setAiKeyConfigured(Boolean(json.aiKeyConfigured));
+      }
     } catch { toast.error("Network error"); }
     finally { setLoading(false); }
   };
@@ -147,6 +151,15 @@ export function SettingsAdmin() {
             <Card key={g.title}>
               <CardHeader>
                 <CardTitle className="text-sm">{g.title}</CardTitle>
+                {g.note && (
+                  <p className="mt-1 text-[12px] leading-relaxed text-muted-foreground">{g.note}</p>
+                )}
+                {g.title === "AI API" && aiKeyConfigured !== null && (
+                  <span className="mt-1 inline-flex items-center gap-1.5 font-mono text-[10px] uppercase tracking-[0.14em] text-muted-foreground">
+                    <span className={`h-1.5 w-1.5 ${aiKeyConfigured ? "bg-[var(--fubrio-accent)]" : "bg-muted-foreground/40"}`} />
+                    {aiKeyConfigured ? "Server key set" : "No server key"}
+                  </span>
+                )}
               </CardHeader>
               <CardContent className="space-y-4">
                 {g.keys.map((k) => (

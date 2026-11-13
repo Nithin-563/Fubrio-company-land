@@ -1,8 +1,13 @@
 import { NextRequest, NextResponse } from "next/server";
 import { verifyApiKey, logApiKeyEvent } from "@/lib/api-keys";
 import { checkRateLimitAi, getAiDailyLimitForUser } from "@/lib/rate-limit";
-
-type Provider = "openai" | "gemini" | "anthropic";
+import {
+  isAiKeyConfigured,
+  openAiChatEndpoint,
+  readAiSettings,
+  resolveAiConfig,
+  type AiConfig,
+} from "@/lib/ai-config";
 
 interface ChatMessage {
   role: "user" | "assistant" | "system";
@@ -17,108 +22,12 @@ interface ChatRequestBody {
   system?: string;
 }
 
-interface AiConfig {
-  provider: Provider;
-  baseUrl: string;
-  apiKey: string;
-  model: string;
-  systemPrompt: string;
-}
-
-const DEFAULT_BASE_URLS: Record<Provider, string> = {
-  openai: "https://api.openai.com/v1",
-  gemini: "https://generativelanguage.googleapis.com/v1beta",
-  anthropic: "https://api.anthropic.com/v1",
-};
-
-const DEFAULT_SYSTEM_PROMPT =
-  "You are a helpful assistant. Be accurate, concise and direct. Refuse harmful, illegal or hateful requests.";
-
-const SETTING_KEYS = [
-  "ai.provider",
-  "ai.baseUrl",
-  "ai.apiKey",
-  "ai.model",
-  "ai.systemPrompt",
-  "ai.assistantName",
-];
-
-async function readSettingValues(): Promise<Record<string, string>> {
-  try {
-    const { supabase } = await import("@/lib/supabase");
-    const { data } = await supabase.from("site_settings").select("key, value");
-    const out: Record<string, string> = {};
-    for (const row of data ?? []) {
-      const key = (row as { key?: string }).key;
-      const value = (row as { value?: unknown }).value;
-      if (typeof key === "string" && value != null) out[key] = String(value);
-    }
-    return out;
-  } catch {
-    return {};
-  }
-}
-
-function normaliseBaseUrl(raw: string, provider: Provider): string {
-  const trimmed = raw.trim().replace(/\/+$/, "");
-  if (!trimmed) return DEFAULT_BASE_URLS[provider];
-  return trimmed;
-}
-
-function openAiEndpoint(baseUrl: string): string {
-  if (/\/chat\/completions$/.test(baseUrl)) return baseUrl;
-  if (/\/(v1|openai)$/.test(baseUrl)) return `${baseUrl}/chat/completions`;
-  return `${baseUrl}/chat/completions`;
-}
-
-async function resolveConfig(overrides: { model?: string }): Promise<AiConfig> {
-  const settings = await readSettingValues();
-
-  const rawProvider = (
-    settings["ai.provider"] ||
-    process.env.AI_PROVIDER ||
-    (process.env.WISEE_AI_UPSTREAM_KEY ? "gemini" : "openai")
-  ).toLowerCase();
-  const provider: Provider =
-    rawProvider === "gemini" || rawProvider === "google"
-      ? "gemini"
-      : rawProvider === "anthropic" || rawProvider === "claude"
-        ? "anthropic"
-        : "openai";
-
-  const baseUrl = normaliseBaseUrl(
-    settings["ai.baseUrl"] ||
-      process.env.AI_BASE_URL ||
-      process.env.WISEE_AI_UPSTREAM_URL ||
-      DEFAULT_BASE_URLS[provider],
-    provider,
-  );
-
-  const apiKey =
-    settings["ai.apiKey"] ||
-    process.env.AI_API_KEY ||
-    process.env.WISEE_AI_UPSTREAM_KEY ||
-    "";
-
-  const model =
-    overrides.model ||
-    settings["ai.model"] ||
-    process.env.AI_MODEL ||
-    process.env.WISEE_AI_UPSTREAM_MODEL ||
-    (provider === "gemini" ? "gemini-2.0-flash" : provider === "anthropic" ? "claude-3-5-sonnet-latest" : "gpt-4o-mini");
-
-  const systemPrompt =
-    settings["ai.systemPrompt"] || process.env.AI_SYSTEM_PROMPT || DEFAULT_SYSTEM_PROMPT;
-
-  return { provider, baseUrl, apiKey, model, systemPrompt };
-}
-
 function serviceError(status: number, message: string, model = "") {
   return NextResponse.json({ ok: false, error: message, model }, { status });
 }
 
 function upstreamMessage(status: number): string {
-  if (status === 401 || status === 403) return "Upstream provider rejected the credentials. Check the configured API key.";
+  if (status === 401 || status === 403) return "Upstream provider rejected the credentials. Check the server key.";
   if (status === 404) return "Upstream provider could not find that model or endpoint. Check the model and base URL.";
   if (status === 429) return "Upstream provider rate limit reached. Retry shortly.";
   if (status >= 500) return "Upstream provider is unavailable. Retry shortly.";
@@ -191,12 +100,12 @@ export async function POST(req: NextRequest) {
     const modelOverride =
       typeof body.model === "string" && body.model.trim() ? body.model.trim().slice(0, 120) : undefined;
 
-    const config = await resolveConfig({ model: modelOverride });
+    const config = await resolveAiConfig(modelOverride);
 
     if (!config.apiKey) {
       return serviceError(
         503,
-        "AI provider is not configured. Add a key in Admin > Settings > AI API (ai.apiKey) or set AI_API_KEY / AI_PROVIDER / AI_MODEL / AI_BASE_URL.",
+        "AI provider is not configured. Set AI_API_KEY in the server environment, and the provider / model in Admin > Settings > AI API.",
       );
     }
 
@@ -377,7 +286,7 @@ async function callProvider(
       };
     }
 
-    const res = await fetch(openAiEndpoint(config.baseUrl), {
+    const res = await fetch(openAiChatEndpoint(config.baseUrl), {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -441,30 +350,17 @@ async function safeText(res: Response): Promise<string> {
 }
 
 export async function GET() {
-  const settings = await readSettingValues();
-  const provider = (
-    settings["ai.provider"] ||
-    process.env.AI_PROVIDER ||
-    (process.env.WISEE_AI_UPSTREAM_KEY ? "gemini" : "openai")
-  ).toLowerCase();
-  const model =
-    settings["ai.model"] ||
-    process.env.AI_MODEL ||
-    process.env.WISEE_AI_UPSTREAM_MODEL ||
-    "not set";
-  const configured = Boolean(
-    settings["ai.apiKey"] || process.env.AI_API_KEY || process.env.WISEE_AI_UPSTREAM_KEY,
-  );
-
+  const settings = await readAiSettings();
   return NextResponse.json({
     ok: true,
     service: "ai-chat",
     description: "Chat completion endpoint. Works with any OpenAI-compatible provider, Gemini or Anthropic.",
-    configured,
-    provider,
-    model,
+    configured: isAiKeyConfigured(),
+    provider: settings.provider,
+    model: settings.model,
     docs: "POST with Authorization: Bearer fubrio_... and { messages: [{ role, content }], model?, temperature?, maxTokens? }",
     providers: ["openai", "gemini", "anthropic"],
-    settings: SETTING_KEYS,
+    keyLocation: "server environment only",
+    settings: ["ai.provider", "ai.baseUrl", "ai.model", "ai.assistantName", "ai.systemPrompt"],
   });
 }

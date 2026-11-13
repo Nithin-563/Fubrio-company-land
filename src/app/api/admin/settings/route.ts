@@ -4,6 +4,7 @@ import { authOptions } from "@/lib/auth";
 import { canSession, canSessionAccess } from "@/lib/types";
 import { supabase } from "@/lib/supabase";
 import { safeAuditLog } from "@/lib/audit";
+import { isAiKeyConfigured, isSecretSettingKey, stripSecretSettings } from "@/lib/ai-config";
 
 function getRealUserId(session: any): string | null {
   const id = (session?.user as { id?: string })?.id;
@@ -26,12 +27,16 @@ export async function GET() {
     }
     const settings: Record<string, string> = {};
     for (const r of rows ?? []) {
-      if (r && r.key) settings[r.key] = r.value;
+      if (r && r.key && !isSecretSettingKey(r.key)) settings[r.key] = r.value;
     }
-    return NextResponse.json({ ok: true, settings });
+    return NextResponse.json({
+      ok: true,
+      settings: stripSecretSettings(settings),
+      aiKeyConfigured: isAiKeyConfigured(),
+    });
   } catch (err) {
     console.error("[Fubrio] Settings GET exception:", err);
-    return NextResponse.json({ ok: true, settings: {} });
+    return NextResponse.json({ ok: false, error: "Settings unavailable" }, { status: 500 });
   }
 }
 
@@ -46,9 +51,14 @@ export async function PUT(req: NextRequest) {
     const settings = body.settings ?? {};
 
     const errors: string[] = [];
+    const rejected: string[] = [];
     let savedCount = 0;
 
     for (const [key, rawValue] of Object.entries(settings)) {
+      if (isSecretSettingKey(key)) {
+        rejected.push(key);
+        continue;
+      }
       const value = String(rawValue);
       try {
         const { data: updated, error: updErr, count } = await supabase
@@ -102,7 +112,7 @@ export async function PUT(req: NextRequest) {
       action: "update",
       entity: "settings",
       entityId: null,
-      metadata: { keys: Object.keys(settings), savedCount, errors: errors.length },
+      metadata: { keys: Object.keys(settings), savedCount, errors: errors.length, rejected: rejected.length },
     });
 
     if (errors.length > 0) {
@@ -114,7 +124,14 @@ export async function PUT(req: NextRequest) {
       }, { status: 500 });
     }
 
-    return NextResponse.json({ ok: true, savedCount });
+    return NextResponse.json({
+      ok: true,
+      savedCount,
+      rejected,
+      note: rejected.length
+        ? "Secret values are not stored in the database. Set AI_API_KEY in the server environment."
+        : undefined,
+    });
   } catch (err) {
     console.error("[Fubrio] Settings PUT exception:", err);
     const msg = err instanceof Error ? err.message : (err as any)?.message || "Unknown error";
