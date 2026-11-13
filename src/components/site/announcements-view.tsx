@@ -184,8 +184,8 @@ export function AnnouncementsView() {
           Product launches, releases, news, and important updates. {items.length} announcement{items.length === 1 ? "" : "s"} so far.
         </p>
 
-        <div className="mt-6 rounded-2xl border border-border bg-gradient-to-br from-secondary/40 to-background p-5 flex flex-col sm:flex-row items-start sm:items-center gap-4">
-          <div className="flex h-10 w-10 items-center justify-center rounded-full bg-[var(--fubrio-accent-soft)] border border-[var(--fubrio-accent)]/30 flex-shrink-0">
+        <div className="mt-6 rounded-none border border-border bg-gradient-to-br from-secondary/40 to-background p-5 flex flex-col sm:flex-row items-start sm:items-center gap-4">
+          <div className="flex h-10 w-10 items-center justify-center rounded-none bg-[var(--fubrio-accent-soft)] border border-[var(--fubrio-accent)]/30 flex-shrink-0">
             <Bell className="h-4 w-4 text-[var(--fubrio-accent)]" />
           </div>
           <div className="flex-1 min-w-0">
@@ -205,7 +205,7 @@ export function AnnouncementsView() {
               onClick={subscribed ? unsubscribe : subscribe}
               disabled={subscribing}
               variant={subscribed ? "outline" : "default"}
-              className="rounded-full"
+              className="rounded-none"
             >
               {subscribing ? <Loader2 className="h-4 w-4 animate-spin mr-2" /> : subscribed ? <Check className="h-4 w-4 mr-2" /> : <Bell className="h-4 w-4 mr-2" />}
               {subscribed ? "Subscribed" : subscribing ? "Subscribing…" : "Subscribe"}
@@ -215,9 +215,9 @@ export function AnnouncementsView() {
 
         <div className="mt-8 space-y-3">
           {loading ? (
-            Array.from({ length: 4 }).map((_, i) => <Skeleton key={i} className="h-28 rounded-xl" />)
+            Array.from({ length: 4 }).map((_, i) => <Skeleton key={i} className="h-28 rounded-sm" />)
           ) : items.length === 0 ? (
-            <div className="rounded-xl border border-dashed border-border py-20 text-center">
+            <div className="rounded-sm border border-dashed border-border py-20 text-center">
               <Bell className="h-8 w-8 mx-auto mb-2 opacity-50" />
               <div className="font-display text-lg font-semibold">No announcements yet</div>
               <div className="mt-1 text-sm text-muted-foreground">
@@ -229,7 +229,7 @@ export function AnnouncementsView() {
               <button
                 key={item.id}
                 onClick={() => openAnnouncement(item)}
-                className="group w-full text-left rounded-2xl border border-border bg-card overflow-hidden transition-all hover:-translate-y-0.5 hover:border-[var(--fubrio-accent)]/40 glass-card"
+                className="group w-full text-left rounded-none border border-border bg-card overflow-hidden transition-all hover:border-[var(--fubrio-accent)]/40 glass-card"
               >
                 <div className="flex flex-col sm:flex-row">
                   {item.image && (
@@ -304,7 +304,7 @@ export function AnnouncementsView() {
                     <img
                       src={openItem.image}
                       alt=""
-                      className="w-full h-48 sm:h-64 object-cover rounded-xl mb-4"
+                      className="w-full h-48 sm:h-64 object-cover rounded-sm mb-4"
                     />
                   )}
                   {openItem.body && (

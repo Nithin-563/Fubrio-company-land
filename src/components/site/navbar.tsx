@@ -1,167 +1,264 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { Menu, X, Search, ArrowUpRight, Sparkles, ChevronDown } from "lucide-react";
-import { Button } from "@/components/ui/button";
-import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
+import { Menu, Search, X, ArrowUpRight, ChevronDown } from "lucide-react";
+import { Sheet, SheetContent, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
 import { cn } from "@/lib/utils";
 import { ThemeToggle } from "@/components/shared/theme-toggle";
-import { Logo } from "@/components/shared/logo";
-import { navigate } from "@/lib/router";
+import { navigate, useHashRoute } from "@/lib/router";
 import type { BrandConfig } from "@/lib/brand";
 import { FUBRIO_CONFIG } from "@/lib/brand";
 
+const GROUPS: Array<{ title: string; keys: string[] }> = [
+  { title: "The studio", keys: ["About", "Partners", "Sponsors", "FAQ"] },
+  { title: "Resources", keys: ["Docs", "API Keys", "Pricing", "Announcements"] },
+  { title: "Elsewhere", keys: ["Contact", "Shop", "Blog"] },
+];
+
+function splitRoute(route: string) {
+  const clean = route.startsWith("#") ? route.slice(1) : route;
+  return clean.split("/").filter(Boolean)[0] ?? "home";
+}
+
+function Wordmark({ name, subtitle }: { name: string; subtitle?: string }) {
+  return (
+    <span className="flex items-baseline gap-2">
+      <span className="font-display text-[1.6rem] leading-none tracking-[-0.03em]">{name}</span>
+      {subtitle ? (
+        <span className="hidden font-mono text-[10px] uppercase tracking-[0.14em] text-muted-foreground sm:inline">
+          {subtitle}
+        </span>
+      ) : (
+        <span className="mb-[3px] h-[7px] w-[7px] shrink-0 bg-[var(--fubrio-accent)]" aria-hidden />
+      )}
+    </span>
+  );
+}
+
 export function Navbar({ onOpenSearch, brand = FUBRIO_CONFIG }: { onOpenSearch: () => void; brand?: BrandConfig }) {
-  const NAV_ITEMS = brand.navItems;
-  const SECONDARY_ITEMS = brand.secondaryNavItems;
-  const [scrolled, setScrolled] = useState(false);
+  const route = useHashRoute();
+  const current = splitRoute(route);
   const [mobileOpen, setMobileOpen] = useState(false);
-  const [moreOpen, setMoreOpen] = useState(false);
+  const [indexOpen, setIndexOpen] = useState(false);
 
   useEffect(() => {
-    const onScroll = () => setScrolled(window.scrollY > 16);
-    onScroll();
-    window.addEventListener("scroll", onScroll, { passive: true });
-    return () => window.removeEventListener("scroll", onScroll);
-  }, []);
+    setIndexOpen(false);
+  }, [route]);
 
   const go = (href: string) => {
     setMobileOpen(false);
-    setMoreOpen(false);
+    setIndexOpen(false);
     navigate(href);
   };
 
+  const tabs = brand.navItems;
+  const secondary = brand.secondaryNavItems;
+  const isTabActive = (href: string) => splitRoute(href) === current;
+
+  const grouped = GROUPS.map((g) => ({
+    ...g,
+    items: g.keys
+      .map((k) => secondary.find((s) => s.label === k))
+      .filter((s): s is { label: string; href: string } => Boolean(s)),
+  })).filter((g) => g.items.length > 0);
+
   return (
-    <header
-      className={cn(
-        "sticky top-0 inset-x-0 z-40 transition-all duration-300",
-        scrolled
-          ? "glass-nav"
-          : "bg-transparent border-b border-transparent",
-      )}
-    >
-      <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-        <div className="flex h-16 items-center justify-between">
-          <button onClick={() => go("#home")} className="flex items-center gap-2 focus-premium rounded-md" aria-label={brand.name + " home"}>
-            <Logo text={brand.name} showImage={!brand.isBloom} subtitle={brand.isBloom ? "by Fubrio" : undefined} />
+    <header className="sticky top-0 z-40 border-b border-border bg-background">
+      <div className="mx-auto max-w-[84rem] px-4 sm:px-6 lg:px-8">
+        <div className="flex h-[60px] items-center justify-between gap-4">
+          <button
+            onClick={() => go("#home")}
+            className="focus-premium -ml-1 flex items-center rounded-sm px-1 py-1"
+            aria-label={`${brand.name} home`}
+          >
+            <Wordmark name={brand.name} subtitle={brand.isBloom ? "by Fubrio" : undefined} />
           </button>
 
-          <nav className="hidden lg:flex items-center gap-1">
-            {NAV_ITEMS.map((item) => (
+          <nav className="hidden items-center gap-1 md:flex" aria-label="Sections">
+            {tabs.map((item) => (
               <button
                 key={item.href}
                 onClick={() => go(item.href)}
-                className="relative px-3 py-2 text-sm font-medium text-muted-foreground hover:text-foreground transition-colors rounded-md"
+                aria-current={isTabActive(item.href) ? "page" : undefined}
+                className={cn(
+                  "relative rounded-sm px-2.5 py-1.5 text-[0.8125rem] transition-colors",
+                  isTabActive(item.href)
+                    ? "text-foreground"
+                    : "text-muted-foreground hover:text-foreground",
+                )}
               >
                 {item.label}
+                {isTabActive(item.href) && (
+                  <span
+                    className="absolute inset-x-2 -bottom-[9px] h-[2px] bg-foreground"
+                    aria-hidden
+                  />
+                )}
               </button>
             ))}
-            <div className="relative">
-              <button
-                onClick={() => setMoreOpen((s) => !s)}
-                onBlur={() => setTimeout(() => setMoreOpen(false), 150)}
-                className="flex items-center gap-1 px-3 py-2 text-sm font-medium text-muted-foreground hover:text-foreground transition-colors rounded-md"
-              >
-                More
-                <ChevronDown className={cn("h-3.5 w-3.5 transition-transform", moreOpen && "rotate-180")} />
-              </button>
-              {moreOpen && (
-                <div className="absolute right-0 top-full mt-2 w-64 rounded-xl border border-border bg-popover p-2 shadow-xl animate-scale-in">
-                  {SECONDARY_ITEMS.map((item) => (
-                    <button
-                      key={item.href}
-                      onClick={() => go(item.href)}
-                      className="flex w-full items-center justify-between rounded-lg px-3 py-2 text-sm hover:bg-accent transition-colors"
-                    >
-                      {item.label}
-                      <ArrowUpRight className="h-3.5 w-3.5 opacity-50" />
-                    </button>
-                  ))}
-                  <div className="my-1 h-px bg-border" />
-                  <button
-                    onClick={() => go("#admin")}
-                    className="flex w-full items-center gap-2 rounded-lg px-3 py-2 text-sm hover:bg-accent transition-colors"
-                  >
-                    <Sparkles className="h-3.5 w-3.5 text-[var(--fubrio-accent)]" />
-                    Admin Dashboard
-                  </button>
-                  <button
-                    onClick={() => go("#czer")}
-                    className="flex w-full items-center justify-between rounded-lg px-3 py-1.5 text-[11px] text-muted-foreground hover:bg-accent hover:text-foreground transition-colors"
-                  >
-                    <span>Czer</span>
-                  </button>
-                </div>
-              )}
-            </div>
           </nav>
 
-          <div className="flex items-center gap-1">
-            <Button variant="ghost" size="icon" className="rounded-full h-9 w-9" onClick={onOpenSearch} aria-label="Search">
-              <Search className="h-4 w-4" />
-            </Button>
-            <ThemeToggle />
-            <Button
-              variant="default"
-              size="sm"
-              className="hidden sm:inline-flex ml-2 bg-foreground text-background hover:bg-foreground/90 rounded-full"
-              onClick={() => go("#contact")}
+          <div className="flex items-center gap-0.5">
+            <button
+              onClick={onOpenSearch}
+              className="focus-premium hidden h-8 items-center gap-1.5 rounded-sm border border-transparent px-2 text-muted-foreground transition-colors hover:border-border hover:text-foreground sm:flex"
+              aria-label="Search"
             >
-              Contact
-            </Button>
+              <Search className="h-[15px] w-[15px]" />
+              <span className="font-mono text-[10px] tracking-[0.06em]">⌘K</span>
+            </button>
+
+            <ThemeToggle />
+
+            <div className="relative">
+              <button
+                onClick={() => setIndexOpen((s) => !s)}
+                className={cn(
+                  "hidden items-center gap-1 rounded-sm px-2.5 py-1.5 text-[0.8125rem] transition-colors md:flex",
+                  indexOpen ? "text-foreground" : "text-muted-foreground hover:text-foreground",
+                )}
+                aria-expanded={indexOpen}
+                aria-haspopup="true"
+              >
+                Index
+                <ChevronDown className={cn("h-3 w-3 transition-transform", indexOpen && "rotate-180")} />
+              </button>
+
+              {indexOpen && (
+                <>
+                  <div
+                    className="fixed inset-0 z-40"
+                    onClick={() => setIndexOpen(false)}
+                    aria-hidden
+                  />
+                  <div className="absolute right-0 top-full z-50 mt-3 w-[30rem] border border-border bg-background p-5 shadow-[6px_6px_0_0_rgba(0,0,0,0.06)] animate-fade-in">
+                    <div className="grid grid-cols-3 gap-5">
+                      {grouped.map((group) => (
+                        <div key={group.title}>
+                          <div className="eyebrow mb-2 border-b border-border pb-2">{group.title}</div>
+                          <ul className="space-y-1">
+                            {group.items.map((item) => (
+                              <li key={item.href}>
+                                <button
+                                  onClick={() => go(item.href)}
+                                  className="w-full rounded-sm py-1 text-left text-[0.8125rem] text-muted-foreground transition-colors hover:text-foreground"
+                                >
+                                  {item.label}
+                                </button>
+                              </li>
+                            ))}
+                          </ul>
+                        </div>
+                      ))}
+                    </div>
+                    <div className="mt-4 flex items-center justify-between border-t border-border pt-3">
+                      <button
+                        onClick={() => go("#admin")}
+                        className="font-mono text-[10px] uppercase tracking-[0.1em] text-muted-foreground transition-colors hover:text-foreground"
+                      >
+                        Admin
+                      </button>
+                      <button
+                        onClick={() => go("#czer")}
+                        className="font-mono text-[10px] uppercase tracking-[0.1em] text-muted-foreground/60 transition-colors hover:text-foreground"
+                      >
+                        Czer
+                      </button>
+                    </div>
+                  </div>
+                </>
+              )}
+            </div>
+
+            <button
+              onClick={() => go("#contact")}
+              className="btn-ink ml-2 hidden h-8 px-3 text-[0.8125rem] sm:inline-flex"
+            >
+              Start a project
+            </button>
+
             <Sheet open={mobileOpen} onOpenChange={setMobileOpen}>
               <SheetTrigger asChild>
-                <Button variant="ghost" size="icon" className="lg:hidden rounded-full h-9 w-9" aria-label="Open menu">
-                  <Menu className="h-4 w-4" />
-                </Button>
+                <button
+                  className="focus-premium ml-1 flex h-8 w-8 items-center justify-center rounded-sm text-foreground md:hidden"
+                  aria-label="Open menu"
+                >
+                  <Menu className="h-[18px] w-[18px]" />
+                </button>
               </SheetTrigger>
-              <SheetContent side="right" className="w-full sm:w-[380px] p-0">
-                <SheetHeader className="px-6 pt-6 pb-4 border-b border-border">
-                  <div className="flex items-center justify-between">
+              <SheetContent side="right" className="w-full p-0 sm:w-[360px]">
+                <div className="flex h-full flex-col">
+                  <div className="flex items-center justify-between border-b border-border px-5 py-4">
                     <SheetTitle className="text-left">
-                      <Logo />
+                      <Wordmark name={brand.name} subtitle={brand.isBloom ? "by Fubrio" : undefined} />
                     </SheetTitle>
-                  </div>
-                </SheetHeader>
-                <div className="flex flex-col px-6 py-4 overflow-y-auto h-full">
-                  <nav className="flex flex-col gap-1">
-                    {[...NAV_ITEMS, ...SECONDARY_ITEMS].map((item) => (
-                      <button
-                        key={item.href}
-                        onClick={() => go(item.href)}
-                        className="group flex items-center justify-between rounded-lg px-3 py-3 text-left hover:bg-accent transition-colors"
-                      >
-                        <div>
-                          <div className="text-sm font-medium">{item.label}</div>
-                          {(item as any).desc && <div className="text-xs text-muted-foreground mt-0.5">{(item as any).desc}</div>}
-                        </div>
-                        <ArrowUpRight className="h-4 w-4 opacity-0 group-hover:opacity-100 transition-opacity" />
-                      </button>
-                    ))}
-                  </nav>
-                  <div className="mt-6 pt-6 border-t border-border">
-                    <Button
-                      onClick={() => go("#admin")}
-                      variant="outline"
-                      className="w-full justify-start gap-2"
-                    >
-                      <Sparkles className="h-4 w-4 text-[var(--fubrio-accent)]" />
-                      Admin Dashboard
-                    </Button>
-                    <Button
-                      onClick={() => go("#contact")}
-                      className="w-full mt-3 bg-foreground text-background hover:bg-foreground/90 rounded-full"
-                    >
-                      Contact Fubrio
-                    </Button>
-                  </div>
-                  <div className="mt-3 pt-3 border-t border-border/50">
                     <button
-                      onClick={() => go("#czer")}
-                      className="w-full text-left text-xs text-muted-foreground hover:text-foreground transition-colors px-1 py-1.5"
+                      onClick={() => setMobileOpen(false)}
+                      className="text-muted-foreground"
+                      aria-label="Close menu"
                     >
-                      Czer
+                      <X className="h-4 w-4" />
                     </button>
+                  </div>
+
+                  <div className="flex-1 overflow-y-auto px-5 py-4">
+                    <div className="eyebrow mb-2">Sections</div>
+                    <ul className="ruled-list">
+                      {tabs.map((item) => (
+                        <li key={item.href}>
+                          <button
+                            onClick={() => go(item.href)}
+                            className="flex w-full items-baseline justify-between py-3 text-left"
+                          >
+                            <span className="font-display text-xl">{item.label}</span>
+                            {item.desc ? (
+                              <span className="ml-4 hidden text-right text-[11px] text-muted-foreground sm:block">
+                                {item.desc}
+                              </span>
+                            ) : null}
+                          </button>
+                        </li>
+                      ))}
+                    </ul>
+
+                    {grouped.map((group) => (
+                      <div key={group.title} className="mt-6">
+                        <div className="eyebrow mb-1">{group.title}</div>
+                        <ul className="ruled-list">
+                          {group.items.map((item) => (
+                            <li key={item.href}>
+                              <button
+                                onClick={() => go(item.href)}
+                                className="flex w-full items-center justify-between py-2.5 text-left text-sm text-muted-foreground"
+                              >
+                                {item.label}
+                                <ArrowUpRight className="h-3.5 w-3.5 opacity-50" />
+                              </button>
+                            </li>
+                          ))}
+                        </ul>
+                      </div>
+                    ))}
+                  </div>
+
+                  <div className="border-t border-border p-5">
+                    <button onClick={() => go("#contact")} className="btn-ink w-full">
+                      Start a project
+                    </button>
+                    <div className="mt-3 flex items-center justify-between">
+                      <button
+                        onClick={() => go("#admin")}
+                        className="font-mono text-[10px] uppercase tracking-[0.1em] text-muted-foreground"
+                      >
+                        Admin
+                      </button>
+                      <button
+                        onClick={() => go("#czer")}
+                        className="font-mono text-[10px] uppercase tracking-[0.1em] text-muted-foreground/60"
+                      >
+                        Czer
+                      </button>
+                    </div>
                   </div>
                 </div>
               </SheetContent>

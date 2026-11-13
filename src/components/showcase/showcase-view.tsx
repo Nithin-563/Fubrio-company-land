@@ -1,14 +1,13 @@
 "use client";
 
 import { useMemo, useState } from "react";
-import { Search, ArrowUpRight, SlidersHorizontal, LayoutGrid, List, X, ArrowLeft } from "lucide-react";
-import { Button } from "@/components/ui/button";
+import { Search, ArrowUpRight, ArrowLeft, LayoutGrid, List } from "lucide-react";
 import { Input } from "@/components/ui/input";
-import { Badge } from "@/components/ui/badge";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Skeleton } from "@/components/ui/skeleton";
 import { navigate } from "@/lib/router";
 import { cn } from "@/lib/utils";
+import { Meta } from "@/components/site/editorial";
 import type { SerializedProject, SerializedCategory } from "@/lib/types";
 import { GradientPlaceholder, usableImage } from "@/components/shared/gradient";
 
@@ -17,12 +16,8 @@ interface Props {
   categories: SerializedCategory[];
 }
 
-const STATUS_COLORS: Record<string, string> = {
-  LIVE: "bg-[var(--fubrio-accent)]/15 text-[var(--fubrio-accent)] border-[var(--fubrio-accent)]/30",
-  MAINTENANCE: "bg-amber-500/15 text-amber-500 border-amber-500/30",
-  DRAFT: "bg-muted text-muted-foreground border-border",
-  ARCHIVED: "bg-muted text-muted-foreground border-border",
-};
+const FIELD =
+  "h-9 w-full rounded-none border-0 border-b border-border bg-transparent px-0 text-sm shadow-none focus-visible:border-foreground focus-visible:ring-0 dark:bg-transparent";
 
 export function ShowcaseView({ projects, categories }: Props) {
   const [search, setSearch] = useState("");
@@ -61,105 +56,179 @@ export function ShowcaseView({ projects, categories }: Props) {
     setPage(1);
   };
 
-  const activeFilterCount = (search ? 1 : 0) + (categoryId !== "all" ? 1 : 0) + (status !== "all" ? 1 : 0) + (featuredOnly ? 1 : 0);
+  const activeFilterCount =
+    (search ? 1 : 0) + (categoryId !== "all" ? 1 : 0) + (status !== "all" ? 1 : 0) + (featuredOnly ? 1 : 0);
 
   return (
-    <div className="pt-4 pb-24 min-h-screen">
-      <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-        <button onClick={() => navigate("#home")} className="text-sm text-muted-foreground hover:text-foreground inline-flex items-center gap-1.5 mb-6">
-          <ArrowLeft className="h-3.5 w-3.5" /> Back to home
+    <div className="min-h-screen py-10">
+      <div className="mx-auto max-w-[84rem] px-4 sm:px-6 lg:px-8">
+        <button
+          onClick={() => navigate("#home")}
+          className="mb-8 inline-flex items-center gap-1.5 font-mono text-[11px] uppercase tracking-[0.1em] text-muted-foreground hover:text-foreground"
+        >
+          <ArrowLeft className="h-3.5 w-3.5" /> Home
         </button>
 
-        <div className="flex flex-col gap-6 sm:flex-row sm:items-end sm:justify-between">
-          <div>
-            <div className="text-xs uppercase tracking-wider text-[var(--fubrio-accent)] font-semibold">Showcase</div>
-            <h1 className="display-heading mt-2 text-4xl sm:text-5xl">All projects & creations</h1>
-            <p className="mt-2 text-muted-foreground">{filtered.length} of {projects.length} projects shown.</p>
-          </div>
-          <div className="flex items-center gap-2">
-            <Button variant="outline" size="icon" className="rounded-full" onClick={() => setView(view === "grid" ? "list" : "grid")} aria-label="Toggle view">
-              {view === "grid" ? <List className="h-4 w-4" /> : <LayoutGrid className="h-4 w-4" />}
-            </Button>
+        <div className="chapter-head">
+          <div className="chapter-num">01</div>
+          <div className="flex min-w-0 flex-1 flex-col gap-4 md:flex-row md:items-end md:justify-between">
+            <div>
+              <div className="eyebrow">Showcase</div>
+              <h1 className="display-heading mt-2 text-[2.4rem] leading-[1.02] sm:text-[3.2rem]">
+                Everything we have shipped
+              </h1>
+              <p className="mt-3 max-w-xl text-[0.9375rem] leading-relaxed text-muted-foreground">
+                Case studies, tools and experiments, newest first. {filtered.length} of {projects.length}{" "}
+                shown.
+              </p>
+            </div>
+            <div className="flex items-center gap-1 text-muted-foreground">
+              <button
+                onClick={() => setView("grid")}
+                aria-label="Grid view"
+                aria-pressed={view === "grid"}
+                className={cn("border p-1.5 transition-colors", view === "grid" ? "border-foreground text-foreground" : "border-border hover:text-foreground")}
+              >
+                <LayoutGrid className="h-3.5 w-3.5" />
+              </button>
+              <button
+                onClick={() => setView("list")}
+                aria-label="List view"
+                aria-pressed={view === "list"}
+                className={cn("border p-1.5 transition-colors", view === "list" ? "border-foreground text-foreground" : "border-border hover:text-foreground")}
+              >
+                <List className="h-3.5 w-3.5" />
+              </button>
+            </div>
           </div>
         </div>
 
-        <div className="mt-8 flex flex-col lg:flex-row gap-3">
-          <div className="relative flex-1">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+        {/* Filters sit on a single ruled row, like a catalogue index. */}
+        <div className="mt-8 grid items-end gap-x-6 gap-y-4 border-b border-border pb-4 sm:grid-cols-2 lg:grid-cols-12">
+          <div className="relative lg:col-span-4">
+            <Search className="absolute left-0 top-1/2 h-3.5 w-3.5 -translate-y-1/2 text-muted-foreground" />
             <Input
               value={search}
               onChange={(e) => { setSearch(e.target.value); setPage(1); }}
-              placeholder="Search projects…"
-              className="pl-10 bg-background"
+              placeholder="Search projects"
+              aria-label="Search projects"
+              className={cn(FIELD, "pl-6")}
             />
           </div>
-          <Select value={categoryId} onValueChange={(v) => { setCategoryId(v); setPage(1); }}>
-            <SelectTrigger className="bg-background w-full lg:w-48"><SelectValue placeholder="Category" /></SelectTrigger>
-            <SelectContent>
-              <SelectItem value="all">All categories</SelectItem>
-              {categories.map((c) => (
-                <SelectItem key={c.id} value={c.id}>{c.name}</SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-          <Select value={status} onValueChange={(v) => { setStatus(v); setPage(1); }}>
-            <SelectTrigger className="bg-background w-full lg:w-40"><SelectValue placeholder="Status" /></SelectTrigger>
-            <SelectContent>
-              <SelectItem value="all">All status</SelectItem>
-              <SelectItem value="LIVE">Live</SelectItem>
-              <SelectItem value="MAINTENANCE">Maintenance</SelectItem>
-              <SelectItem value="DRAFT">Draft</SelectItem>
-            </SelectContent>
-          </Select>
-          <Select value={sort} onValueChange={(v) => setSort(v as typeof sort)}>
-            <SelectTrigger className="bg-background w-full lg:w-40"><SelectValue placeholder="Sort" /></SelectTrigger>
-            <SelectContent>
-              <SelectItem value="newest">Newest first</SelectItem>
-              <SelectItem value="oldest">Oldest first</SelectItem>
-              <SelectItem value="name">A → Z</SelectItem>
-              <SelectItem value="featured">Featured first</SelectItem>
-            </SelectContent>
-          </Select>
-          <Button
-            variant={featuredOnly ? "default" : "outline"}
-            onClick={() => { setFeaturedOnly(!featuredOnly); setPage(1); }}
-            className="rounded-full"
-          >
-            <SlidersHorizontal className="h-3.5 w-3.5 mr-1.5" />
-            Featured
-          </Button>
-          {activeFilterCount > 0 && (
-            <Button variant="ghost" onClick={resetFilters} className="rounded-full">
-              <X className="h-3.5 w-3.5 mr-1.5" />
-              Clear ({activeFilterCount})
-            </Button>
-          )}
+
+          <div className="lg:col-span-2">
+            <Select value={categoryId} onValueChange={(v) => { setCategoryId(v); setPage(1); }}>
+              <SelectTrigger className={FIELD}><SelectValue placeholder="Category" /></SelectTrigger>
+              <SelectContent className="rounded-none">
+                <SelectItem value="all">All categories</SelectItem>
+                {categories.map((c) => (
+                  <SelectItem key={c.id} value={c.id}>{c.name}</SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+
+          <div className="lg:col-span-2">
+            <Select value={status} onValueChange={(v) => { setStatus(v); setPage(1); }}>
+              <SelectTrigger className={FIELD}><SelectValue placeholder="Status" /></SelectTrigger>
+              <SelectContent className="rounded-none">
+                <SelectItem value="all">Any status</SelectItem>
+                <SelectItem value="LIVE">Live</SelectItem>
+                <SelectItem value="MAINTENANCE">Maintenance</SelectItem>
+                <SelectItem value="DRAFT">Draft</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+
+          <div className="lg:col-span-2">
+            <Select value={sort} onValueChange={(v) => setSort(v as typeof sort)}>
+              <SelectTrigger className={FIELD}><SelectValue placeholder="Sort" /></SelectTrigger>
+              <SelectContent className="rounded-none">
+                <SelectItem value="newest">Newest first</SelectItem>
+                <SelectItem value="oldest">Oldest first</SelectItem>
+                <SelectItem value="name">A → Z</SelectItem>
+                <SelectItem value="featured">Featured first</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+
+          <div className="flex items-center gap-4 lg:col-span-2">
+            <button
+              onClick={() => { setFeaturedOnly(!featuredOnly); setPage(1); }}
+              aria-pressed={featuredOnly}
+              className={cn(
+                "border-b pb-0.5 text-[13px] transition-colors",
+                featuredOnly ? "border-foreground text-foreground" : "border-transparent text-muted-foreground hover:text-foreground",
+              )}
+            >
+              Featured only
+            </button>
+            {activeFilterCount > 0 && (
+              <button
+                onClick={resetFilters}
+                className="font-mono text-[10px] uppercase tracking-[0.08em] text-muted-foreground underline-offset-4 hover:text-foreground hover:underline"
+              >
+                Clear ({activeFilterCount})
+              </button>
+            )}
+          </div>
         </div>
 
         {paged.length === 0 ? (
-          <div className="mt-16 text-center py-20 border border-dashed border-border rounded-2xl">
-            <div className="font-display text-lg font-semibold">No projects found</div>
-            <div className="mt-1 text-sm text-muted-foreground">Try adjusting your search or filters.</div>
+          <div className="py-24">
+            <div className="font-display text-[1.8rem]">Nothing matches that.</div>
+            <p className="mt-2 text-sm text-muted-foreground">Try a different word, or clear the filters.</p>
             {activeFilterCount > 0 && (
-              <Button variant="outline" onClick={resetFilters} className="mt-4 rounded-full">Clear filters</Button>
+              <button onClick={resetFilters} className="mt-5 border border-border px-4 py-2 text-sm transition-colors hover:border-foreground">
+                Clear filters
+              </button>
             )}
           </div>
-        ) : (
-          <div className={cn(
-            "mt-10 gap-5",
-            view === "grid" ? "grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3" : "flex flex-col",
-          )}>
-            {paged.map((p) => (
-              <ProjectCard key={p.id} project={p} view={view} />
-            ))}
+        ) : view === "grid" ? (
+          <div className="mt-8 grid grid-cols-1 gap-x-8 gap-y-10 sm:grid-cols-2 lg:grid-cols-3">
+            {paged.map((p) => <ProjectCard key={p.id} project={p} />)}
           </div>
+        ) : (
+          <ul className="ruled-list mt-6 border-t border-border">
+            {paged.map((p, i) => (
+              <li key={p.id}>
+                <button
+                  onClick={() => navigate(`#showcase/${p.slug}`)}
+                  className="group grid w-full grid-cols-[1.75rem_1fr_auto] items-center gap-4 py-4 text-left"
+                >
+                  <Meta>{String(i + 1 + (current - 1) * PER_PAGE).padStart(2, "0")}</Meta>
+                  <span className="min-w-0">
+                    <span className="flex flex-wrap items-baseline gap-x-3">
+                      <span className="font-display text-[1.35rem] transition-colors group-hover:text-[var(--fubrio-accent)]">{p.title}</span>
+                      <Meta>{p.category?.name ?? "Project"}</Meta>
+                      <Meta>{p.status}</Meta>
+                    </span>
+                    <span className="mt-0.5 line-clamp-1 block text-sm text-muted-foreground">{p.shortDesc}</span>
+                  </span>
+                  <ArrowUpRight className="h-4 w-4 text-muted-foreground transition-transform group-hover:-translate-y-0.5 group-hover:translate-x-0.5" />
+                </button>
+              </li>
+            ))}
+          </ul>
         )}
 
         {totalPages > 1 && (
-          <div className="mt-12 flex items-center justify-center gap-2">
-            <Button variant="outline" size="sm" disabled={current === 1} onClick={() => setPage(current - 1)} className="rounded-full">Previous</Button>
-            <span className="text-sm text-muted-foreground">Page {current} of {totalPages}</span>
-            <Button variant="outline" size="sm" disabled={current === totalPages} onClick={() => setPage(current + 1)} className="rounded-full">Next</Button>
+          <div className="mt-12 flex items-center justify-between border-t border-border pt-4">
+            <button
+              onClick={() => setPage(current - 1)}
+              disabled={current === 1}
+              className="font-mono text-[11px] uppercase tracking-[0.1em] text-muted-foreground disabled:opacity-40 enabled:hover:text-foreground"
+            >
+              ← Previous
+            </button>
+            <Meta>Page {current} / {totalPages}</Meta>
+            <button
+              onClick={() => setPage(current + 1)}
+              disabled={current === totalPages}
+              className="font-mono text-[11px] uppercase tracking-[0.1em] text-muted-foreground disabled:opacity-40 enabled:hover:text-foreground"
+            >
+              Next →
+            </button>
           </div>
         )}
       </div>
@@ -167,47 +236,51 @@ export function ShowcaseView({ projects, categories }: Props) {
   );
 }
 
-function ProjectCard({ project, view }: { project: SerializedProject; view: "grid" | "list" }) {
+function ProjectCard({ project }: { project: SerializedProject }) {
   return (
     <button
       onClick={() => navigate(`#showcase/${project.slug}`)}
-      className={cn(
-        "group relative overflow-hidden rounded-2xl border border-border bg-card text-left transition-all hover:-translate-y-0.5 hover:border-[var(--fubrio-accent)]/40",
-        view === "list" && "flex items-center gap-4",
-      )}
+      className="group text-left focus-premium"
     >
-      <div className={cn("relative overflow-hidden", view === "list" ? "w-48 h-32 flex-shrink-0" : "aspect-[16/11]")}>
+      <div className="relative aspect-[4/3] w-full overflow-hidden border border-border bg-muted">
         {usableImage(project.coverImage) ? (
-                       
-                      <img src={project.coverImage} alt={project.title} className="absolute inset-0 h-full w-full object-cover transition-transform duration-700 group-hover:scale-105" />
-                    ) : (
-                      <GradientPlaceholder seed={project.title} label={project.category?.name} className="absolute inset-0" size="md" />
-                    )}
-        <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent" />
-        <div className="absolute top-3 right-3 flex gap-1.5">
-          {project.featured && (
-            <Badge variant="secondary" className="bg-black/60 backdrop-blur text-white border-white/20 text-[10px]">Featured</Badge>
-          )}
-        </div>
-      </div>
-      <div className={cn("p-4", view === "list" && "flex-1")}>
-        <div className="flex items-center gap-2 text-[10px] uppercase tracking-wider text-muted-foreground mb-1">
-          {project.category && <span>{project.category.name}</span>}
-          <span className={cn("rounded-full px-1.5 py-0.5 text-[9px] border", STATUS_COLORS[project.status] ?? STATUS_COLORS.DRAFT)}>
-            {project.status}
+          <img
+            src={project.coverImage as string}
+            alt={project.title}
+            width={800}
+            height={600}
+            loading="lazy"
+            decoding="async"
+            className="absolute inset-0 h-full w-full object-cover transition-transform duration-700 group-hover:scale-[1.03]"
+          />
+        ) : (
+          <GradientPlaceholder seed={project.title} label={project.category?.name} className="absolute inset-0" size="md" />
+        )}
+        {project.featured && (
+          <span className="absolute left-0 top-0 bg-background px-2 py-1 font-mono text-[9px] uppercase tracking-[0.1em]">
+            Featured
           </span>
+        )}
+      </div>
+
+      <div className="mt-2.5 flex items-start justify-between gap-3">
+        <div className="min-w-0">
+          <h3 className="font-display text-[1.3rem] leading-snug transition-colors group-hover:text-[var(--fubrio-accent)]">
+            {project.title}
+          </h3>
+          <p className="mt-0.5 line-clamp-2 text-[13px] leading-relaxed text-muted-foreground">
+            {project.shortDesc}
+          </p>
         </div>
-        <h3 className="font-display font-semibold text-base group-hover:text-[var(--fubrio-accent)] transition-colors line-clamp-1">{project.title}</h3>
-        <p className="mt-1 text-xs text-muted-foreground line-clamp-2">{project.shortDesc}</p>
-        <div className="mt-3 flex items-center justify-between">
-          <div className="flex flex-wrap gap-1">
-            {project.technologies.slice(0, 3).map((t) => (
-              <span key={t} className="rounded border border-border bg-background px-1.5 py-0.5 text-[10px] text-muted-foreground">{t}</span>
-            ))}
-            {project.technologies.length > 3 && <span className="text-[10px] text-muted-foreground">+{project.technologies.length - 3}</span>}
-          </div>
-          <ArrowUpRight className="h-4 w-4 opacity-0 group-hover:opacity-100 transition-opacity" />
-        </div>
+        <ArrowUpRight className="mt-1 h-4 w-4 shrink-0 text-muted-foreground transition-transform group-hover:-translate-y-0.5 group-hover:translate-x-0.5" />
+      </div>
+
+      <div className="mt-2 flex flex-wrap items-center gap-x-3 border-t border-border pt-2">
+        <Meta>{project.category?.name ?? "Project"}</Meta>
+        <Meta>{project.status}</Meta>
+        {project.technologies.slice(0, 2).map((t) => (
+          <Meta key={t} className="text-muted-foreground/70">{t}</Meta>
+        ))}
       </div>
     </button>
   );
@@ -215,19 +288,16 @@ function ProjectCard({ project, view }: { project: SerializedProject; view: "gri
 
 export function ShowcaseViewSkeleton() {
   return (
-    <div className="pt-4 pb-24 min-h-screen">
-      <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-        <Skeleton className="h-12 w-72" />
-        <Skeleton className="h-4 w-64 mt-2" />
-        <div className="mt-8 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
+    <div className="min-h-screen py-10">
+      <div className="mx-auto max-w-[84rem] px-4 sm:px-6 lg:px-8">
+        <Skeleton className="h-10 w-72 rounded-none" />
+        <Skeleton className="mt-2 h-4 w-64 rounded-none" />
+        <div className="mt-8 grid grid-cols-1 gap-8 sm:grid-cols-2 lg:grid-cols-3">
           {Array.from({ length: 6 }).map((_, i) => (
-            <div key={i} className="rounded-2xl border border-border overflow-hidden">
-              <Skeleton className="aspect-[16/11]" />
-              <div className="p-4 space-y-2">
-                <Skeleton className="h-3 w-20" />
-                <Skeleton className="h-4 w-32" />
-                <Skeleton className="h-3 w-full" />
-              </div>
+            <div key={i}>
+              <Skeleton className="aspect-[4/3] rounded-none" />
+              <Skeleton className="mt-3 h-5 w-32 rounded-none" />
+              <Skeleton className="mt-2 h-3 w-full rounded-none" />
             </div>
           ))}
         </div>

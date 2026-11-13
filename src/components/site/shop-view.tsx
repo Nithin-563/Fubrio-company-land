@@ -154,7 +154,7 @@ export function ShopView({ items, settings }: { items: ShopItem[]; settings?: Re
                 variant={category === c ? "default" : "outline"}
                 size="sm"
                 onClick={() => setCategory(c)}
-                className="rounded-full capitalize"
+                className="rounded-none capitalize"
               >
                 {c}
               </Button>
@@ -162,7 +162,7 @@ export function ShopView({ items, settings }: { items: ShopItem[]; settings?: Re
           </div>
           <div className="flex gap-1.5">
             {(["all", "free", "paid"] as const).map((f) => (
-              <Button key={f} variant={filter === f ? "default" : "outline"} size="sm" onClick={() => setFilter(f)} className="rounded-full capitalize">
+              <Button key={f} variant={filter === f ? "default" : "outline"} size="sm" onClick={() => setFilter(f)} className="rounded-none capitalize">
                 {f}
               </Button>
             ))}
@@ -170,7 +170,7 @@ export function ShopView({ items, settings }: { items: ShopItem[]; settings?: Re
         </div>
 
         {filtered.length === 0 ? (
-          <div className="mt-16 text-center py-20 border border-dashed border-border rounded-2xl">
+          <div className="mt-16 text-center py-20 border border-dashed border-border rounded-none">
             <ShoppingBag className="h-8 w-8 mx-auto mb-2 opacity-50" />
             <div className="font-display text-lg font-semibold">No items found</div>
             <div className="mt-1 text-sm text-muted-foreground">Try adjusting your search or filters.</div>
@@ -178,7 +178,7 @@ export function ShopView({ items, settings }: { items: ShopItem[]; settings?: Re
         ) : (
           <div className="mt-10 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
             {filtered.map((item) => (
-              <div key={item.id} className="group relative rounded-2xl border border-border bg-card overflow-hidden transition-all hover:-translate-y-0.5 hover:border-[var(--fubrio-accent)]/40 glass-card flex flex-col">
+              <div key={item.id} className="group relative rounded-none border border-border bg-card overflow-hidden transition-all hover:border-[var(--fubrio-accent)]/40 glass-card flex flex-col">
                 <div className="aspect-[16/10] relative overflow-hidden">
                   {item.image ? (
                     <img src={item.image} alt={item.title} className="absolute inset-0 h-full w-full object-cover transition-transform duration-700 group-hover:scale-105" />
@@ -189,14 +189,14 @@ export function ShopView({ items, settings }: { items: ShopItem[]; settings?: Re
                   )}
                   <div className="absolute top-3 left-3 flex gap-1.5">
                     {item.featured && (
-                      <Badge variant="secondary" className="bg-black/60 backdrop-blur text-white border-white/20 text-[10px]">Featured</Badge>
+                      <Badge variant="secondary" className="bg-black/60 text-white border-white/20 text-[10px]">Featured</Badge>
                     )}
                     {item.isFree && (
                       <Badge variant="secondary" className="bg-[var(--fubrio-accent)] text-[var(--fubrio-accent-foreground)] text-[10px]">Free</Badge>
                     )}
                   </div>
                   <div className="absolute top-3 right-3">
-                    <div className="rounded-full bg-background/95 backdrop-blur px-3 py-1 text-xs font-semibold">
+                    <div className="rounded-none bg-background/95 px-3 py-1 text-xs font-semibold">
                       {formatPrice(item.price, item.currency || "USD", item.isFree)}
                     </div>
                   </div>
@@ -219,7 +219,7 @@ export function ShopView({ items, settings }: { items: ShopItem[]; settings?: Re
                     {!item.isFree && (
                       <Button
                         size="sm"
-                        className="rounded-full flex-1 bg-foreground text-background hover:bg-foreground/90"
+                        className="rounded-none flex-1 bg-foreground text-background hover:bg-foreground/90"
                         onClick={() => setBuyItem(item)}
                       >
                         <ShoppingBag className="h-3.5 w-3.5 mr-1" />
@@ -227,7 +227,7 @@ export function ShopView({ items, settings }: { items: ShopItem[]; settings?: Re
                       </Button>
                     )}
                     {item.downloadUrl && (
-                      <Button asChild size="sm" variant={item.isFree ? "default" : "outline"} className={cn("rounded-full", item.isFree && "flex-1 bg-foreground text-background hover:bg-foreground/90")}>
+                      <Button asChild size="sm" variant={item.isFree ? "default" : "outline"} className={cn("rounded-none", item.isFree && "flex-1 bg-foreground text-background hover:bg-foreground/90")}>
                         <a href={item.downloadUrl} target="_blank" rel="noopener noreferrer">
                           {item.isFree ? <Download className="h-3.5 w-3.5 mr-1" /> : null}
                           {item.isFree ? "Download" : "Get"}
@@ -235,7 +235,7 @@ export function ShopView({ items, settings }: { items: ShopItem[]; settings?: Re
                       </Button>
                     )}
                     {item.demoUrl && (
-                      <Button asChild variant="outline" size="sm" className="rounded-full">
+                      <Button asChild variant="outline" size="sm" className="rounded-none">
                         <a href={item.demoUrl} target="_blank" rel="noopener noreferrer">
                           <ExternalLink className="h-3.5 w-3.5 mr-1" /> Demo
                         </a>
@@ -262,8 +262,8 @@ export function ShopView({ items, settings }: { items: ShopItem[]; settings?: Re
 
 function SubmitAppCTA({ communityEmail, supportEmail }: { communityEmail: string; supportEmail: string }) {
   return (
-    <section className="mt-20 relative overflow-hidden rounded-3xl border border-border bg-gradient-to-br from-secondary/60 via-background to-background p-8 sm:p-12">
-      <div className="absolute -top-10 -right-10 h-40 w-40 rounded-full bg-[var(--fubrio-accent)]/10 blur-3xl" aria-hidden />
+    <section className="mt-20 relative overflow-hidden rounded-none border border-border bg-gradient-to-br from-secondary/60 via-background to-background p-8 sm:p-12">
+      <div className="absolute -top-10 -right-10 h-40 w-40 rounded-none bg-[var(--fubrio-accent)]/10 blur-3xl" aria-hidden />
       <div className="relative grid grid-cols-1 lg:grid-cols-2 gap-8 items-center">
         <div>
           <div className="text-xs uppercase tracking-wider text-[var(--fubrio-accent)] font-semibold flex items-center gap-2">
@@ -282,11 +282,11 @@ function SubmitAppCTA({ communityEmail, supportEmail }: { communityEmail: string
           </p>
           <div className="mt-5 flex flex-wrap gap-2">
             {["App", "Game", "Bot", "Template", "Plugin", "Tool", "Theme"].map((t) => (
-              <span key={t} className="rounded-full border border-border bg-background px-3 py-1 text-xs text-muted-foreground">{t}</span>
+              <span key={t} className="rounded-none border border-border bg-background px-3 py-1 text-xs text-muted-foreground">{t}</span>
             ))}
           </div>
         </div>
-        <div className="rounded-2xl glass-strong p-6 sm:p-8">
+        <div className="rounded-none glass-strong p-6 sm:p-8">
           <div className="text-xs uppercase tracking-wider text-muted-foreground">What to include in your submission</div>
           <ul className="mt-4 space-y-2 text-sm">
             {[
@@ -307,13 +307,13 @@ function SubmitAppCTA({ communityEmail, supportEmail }: { communityEmail: string
           </ul>
           <div className="mt-6 flex flex-col sm:flex-row gap-3">
             <a href={buildSubmissionMailto(communityEmail)} className="flex-1">
-              <Button className="w-full rounded-full bg-foreground text-background hover:bg-foreground/90">
+              <Button className="w-full rounded-none bg-foreground text-background hover:bg-foreground/90">
                 <Send className="h-4 w-4 mr-1.5" />
                 Submit your app
               </Button>
             </a>
             <a href={`mailto:${supportEmail}`} className="flex-1">
-              <Button variant="outline" className="w-full rounded-full">
+              <Button variant="outline" className="w-full rounded-none">
                 Questions? Email us
               </Button>
             </a>
@@ -401,7 +401,7 @@ function BuyDialog({
       <DialogContent className="max-w-md">
         {!item ? null : done ? (
           <div className="text-center py-6">
-            <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-full bg-[var(--fubrio-accent-soft)] border border-[var(--fubrio-accent)]/30">
+            <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-none bg-[var(--fubrio-accent-soft)] border border-[var(--fubrio-accent)]/30">
               <Check className="h-7 w-7 text-[var(--fubrio-accent)]" />
             </div>
             <h2 className="mt-4 font-display text-2xl font-semibold">Request received</h2>
@@ -417,12 +417,12 @@ function BuyDialog({
               </div>
             )}
             <div className="mt-6 flex flex-col sm:flex-row items-center justify-center gap-3">
-              <Button variant="outline" className="rounded-full" onClick={() => handleOpenChange(false)}>
+              <Button variant="outline" className="rounded-none" onClick={() => handleOpenChange(false)}>
                 Continue browsing
               </Button>
               {chatId && (
                 <Button
-                  className="rounded-full bg-foreground text-background hover:bg-foreground/90"
+                  className="rounded-none bg-foreground text-background hover:bg-foreground/90"
                   onClick={() => {
                     handleOpenChange(false);
                     navigate(`#chat?c=${chatId}&e=${encodeURIComponent(email)}&t=${encodeURIComponent(chatToken || "")}`);
@@ -433,7 +433,7 @@ function BuyDialog({
                 </Button>
               )}
               <a href={`mailto:${supportEmail}`}>
-                <Button variant="outline" className="rounded-full">
+                <Button variant="outline" className="rounded-none">
                   <Mail className="h-4 w-4 mr-1.5" />
                   Email support
                 </Button>

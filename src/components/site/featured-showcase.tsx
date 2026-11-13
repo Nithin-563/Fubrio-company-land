@@ -1,122 +1,140 @@
 "use client";
 
-import { ArrowUpRight, ArrowRight, Boxes } from "lucide-react";
-import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
+import { ArrowUpRight, ArrowRight } from "lucide-react";
 import { GradientPlaceholder, usableImage } from "@/components/shared/gradient";
 import { navigate } from "@/lib/router";
+import { ChapterHead, Meta } from "@/components/site/editorial";
 import type { SerializedProject } from "@/lib/types";
 
 export function FeaturedShowcase({ projects }: { projects: SerializedProject[] }) {
   if (projects.length === 0) return null;
 
-  const hero = projects[0];
-  const side = projects.slice(1, 5);
+  const [lead, ...rest] = projects;
+  const index = rest.slice(0, 4);
 
   return (
-    <section className="py-24 sm:py-32" id="showcase">
-      <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-        <div className="flex items-end justify-between gap-6">
-          <div className="max-w-2xl">
-            <div className="text-xs uppercase tracking-wider text-[var(--fubrio-accent)] font-semibold">
-              Showcase
-            </div>
-            <h2 className="display-heading mt-3 text-4xl sm:text-5xl">
-              Selected work, built with intent.
-            </h2>
-            <p className="mt-4 text-muted-foreground text-base sm:text-lg">
-              A curated selection of products, apps, AI tools, and creative experiments shipped by Fubrio.
-            </p>
-          </div>
-          <Button variant="outline" onClick={() => navigate("#showcase")} className="hidden sm:inline-flex rounded-full group">
-            View all
-            <ArrowRight className="ml-1.5 h-4 w-4 transition-transform group-hover:translate-x-0.5" />
-          </Button>
-        </div>
+    <section className="py-16 sm:py-20" id="showcase">
+      <div className="mx-auto max-w-[84rem] px-4 sm:px-6 lg:px-8">
+        <ChapterHead
+          index="01"
+          label="Selected work"
+          title="Things we finished, and still like."
+          description="Projects, products and experiments from the studio — with the tech that holds them up."
+          action={
+            <button onClick={() => navigate("#showcase")} className="link-arrow text-foreground">
+              Browse the archive <ArrowUpRight className="h-3.5 w-3.5" />
+            </button>
+          }
+        />
 
-        <div className="mt-12 grid grid-cols-1 lg:grid-cols-12 gap-5">
+        <div className="mt-8 grid gap-8 border-b border-border pb-10 lg:grid-cols-12 lg:gap-12">
           <button
-            onClick={() => navigate(`#showcase/${hero.slug}`)}
-            className="group lg:col-span-7 relative rounded-3xl overflow-hidden border border-border glass-card text-left"
+            onClick={() => navigate(`#showcase/${lead.slug}`)}
+            className="group text-left focus-premium lg:col-span-8"
           >
-            <div className="aspect-[16/11] relative overflow-hidden">
-              {usableImage(hero.coverImage) ? (
-                 
-                <img src={hero.coverImage} alt={hero.title} className="absolute inset-0 h-full w-full object-cover transition-transform duration-700 group-hover:scale-105" />
+            <div className="relative aspect-[16/10] w-full overflow-hidden border border-border bg-muted">
+              {usableImage(lead.coverImage) ? (
+                <img
+                  src={lead.coverImage as string}
+                  alt={lead.title}
+                  width={1200}
+                  height={750}
+                  className="absolute inset-0 h-full w-full object-cover transition-transform duration-700 group-hover:scale-[1.02]"
+                />
               ) : (
-                <GradientPlaceholder seed={hero.title} label={hero.category?.name} className="absolute inset-0" size="xl" />
+                <GradientPlaceholder
+                  seed={lead.title}
+                  label={lead.category?.name}
+                  className="absolute inset-0"
+                  size="xl"
+                />
               )}
-              <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent" />
-              <div className="absolute top-5 left-5 flex items-center gap-2">
-                {hero.featured && (
-                  <Badge variant="secondary" className="bg-black/60 backdrop-blur text-white border-white/20">
-                    Featured
-                  </Badge>
-                )}
-                <Badge variant="secondary" className="bg-black/60 backdrop-blur text-white border-white/20">
-                  {hero.status}
-                </Badge>
-              </div>
-              <div className="absolute bottom-0 inset-x-0 p-6 sm:p-8">
-                {hero.category && (
-                  <div className="text-xs uppercase tracking-wider text-white/70 mb-2">{hero.category.name}</div>
-                )}
-                <h3 className="text-2xl sm:text-3xl font-display font-semibold text-white">{hero.title}</h3>
-                <p className="text-sm text-white/80 mt-2 max-w-xl line-clamp-2">{hero.shortDesc}</p>
-                <div className="mt-4 flex items-center gap-2 flex-wrap">
-                  {hero.technologies.slice(0, 5).map((t) => (
-                    <span key={t} className="rounded-md border border-white/15 bg-white/5 px-2 py-0.5 text-[11px] text-white/80 backdrop-blur">
-                      {t}
-                    </span>
-                  ))}
-                </div>
-              </div>
+            </div>
+            <div className="mt-2 flex items-center justify-between">
+              <Meta>{lead.category?.name ?? "Project"}</Meta>
+              <Meta className="group-hover:text-foreground">Open case study ↗</Meta>
             </div>
           </button>
 
-          <div className="lg:col-span-5 grid grid-cols-1 sm:grid-cols-2 gap-5">
-            {side.map((p) => (
-              <button
-                key={p.id}
-                onClick={() => navigate(`#showcase/${p.slug}`)}
-                className="group relative rounded-2xl overflow-hidden border border-border glass-card text-left"
-              >
-                <div className="aspect-[4/3] relative overflow-hidden">
-                  {usableImage(p.coverImage) ? (
-                     
-                    <img src={p.coverImage} alt={p.title} className="absolute inset-0 h-full w-full object-cover transition-transform duration-700 group-hover:scale-105" />
-                  ) : (
-                    <GradientPlaceholder seed={p.title} label={p.category?.name} className="absolute inset-0" size="md" />
-                  )}
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-transparent to-transparent" />
-                  <div className="absolute top-3 right-3">
-                    {p.featured && (
-                      <Badge variant="secondary" className="bg-black/60 backdrop-blur text-white border-white/20">
-                        <Boxes className="h-3 w-3 mr-1" />Featured
-                      </Badge>
-                    )}
+          <div className="flex flex-col justify-between lg:col-span-4">
+            <div>
+              <h3 className="font-display text-[2rem] leading-[1.05]">{lead.title}</h3>
+              <p className="mt-3 text-[0.9375rem] leading-relaxed text-muted-foreground">
+                {lead.shortDesc}
+              </p>
+
+              {lead.technologies.length > 0 && (
+                <div className="mt-6">
+                  <div className="eyebrow mb-2">Built with</div>
+                  <div className="flex flex-wrap gap-x-3 gap-y-1">
+                    {lead.technologies.slice(0, 6).map((t) => (
+                      <Meta key={t}>{t}</Meta>
+                    ))}
                   </div>
                 </div>
-                <div className="absolute bottom-0 inset-x-0 p-4">
-                  {p.category && (
-                    <div className="text-[10px] uppercase tracking-wider text-white/60 mb-1">{p.category.name}</div>
-                  )}
-                  <h3 className="text-base font-semibold text-white line-clamp-1">{p.title}</h3>
-                  <p className="text-xs text-white/70 line-clamp-1 mt-0.5">{p.shortDesc}</p>
-                </div>
-                <div className="absolute top-3 left-3 opacity-0 group-hover:opacity-100 transition-opacity">
-                  <ArrowUpRight className="h-4 w-4 text-white" />
-                </div>
-              </button>
-            ))}
+              )}
+            </div>
+
+            <button
+              onClick={() => navigate(`#showcase/${lead.slug}`)}
+              className="link-arrow mt-8 self-start text-foreground"
+            >
+              Read the case study <ArrowUpRight className="h-3.5 w-3.5" />
+            </button>
           </div>
         </div>
 
-        <div className="mt-8 sm:hidden">
-          <Button variant="outline" onClick={() => navigate("#showcase")} className="w-full rounded-full group">
-            View all projects
-            <ArrowRight className="ml-1.5 h-4 w-4" />
-          </Button>
+        {index.length > 0 && (
+          <ul className="ruled-list mt-0">
+            {index.map((p, i) => (
+              <li key={p.id}>
+                <button
+                  onClick={() => navigate(`#showcase/${p.slug}`)}
+                  className="group grid w-full grid-cols-[2rem_1fr] items-center gap-3 py-4 text-left sm:grid-cols-[2.5rem_6rem_1fr_auto] sm:gap-5"
+                >
+                  <span className="font-mono text-[11px] text-muted-foreground">
+                    {String(i + 2).padStart(3, "0")}
+                  </span>
+
+                  <span className="hidden h-12 w-24 overflow-hidden border border-border bg-muted sm:block">
+                    {usableImage(p.coverImage) ? (
+                      <img
+                        src={p.coverImage as string}
+                        alt=""
+                        width={200}
+                        height={100}
+                        loading="lazy"
+                        decoding="async"
+                        className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
+                      />
+                    ) : (
+                      <GradientPlaceholder seed={p.title} className="h-full w-full" size="sm" />
+                    )}
+                  </span>
+
+                  <span className="min-w-0">
+                    <span className="flex flex-wrap items-baseline gap-x-3">
+                      <span className="font-display text-[1.25rem] leading-tight transition-colors group-hover:text-[var(--fubrio-accent)]">
+                        {p.title}
+                      </span>
+                      <Meta>{p.category?.name ?? p.status}</Meta>
+                    </span>
+                    <span className="mt-0.5 line-clamp-1 block text-sm text-muted-foreground">
+                      {p.shortDesc}
+                    </span>
+                  </span>
+
+                  <ArrowUpRight className="hidden h-4 w-4 text-muted-foreground transition-transform group-hover:-translate-y-0.5 group-hover:translate-x-0.5 sm:block" />
+                </button>
+              </li>
+            ))}
+          </ul>
+        )}
+
+        <div className="mt-6 sm:hidden">
+          <button onClick={() => navigate("#showcase")} className="btn-line w-full">
+            All projects <ArrowRight className="h-4 w-4" />
+          </button>
         </div>
       </div>
     </section>

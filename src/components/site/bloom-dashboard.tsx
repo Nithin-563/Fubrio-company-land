@@ -194,7 +194,7 @@ export function BloomDashboardPlaceholder({ botInviteUrl }: { botInviteUrl?: str
                 const callbackUrl = `${window.location.origin}/#dashboard`;
                 signIn("discord", { callbackUrl });
               }}
-              className="rounded-full bg-foreground text-background hover:bg-foreground/90"
+              className="rounded-none bg-foreground text-background hover:bg-foreground/90"
             >
               <Bot className="h-4 w-4 mr-2" /> Sign in with Discord
             </Button>
@@ -204,7 +204,7 @@ export function BloomDashboardPlaceholder({ botInviteUrl }: { botInviteUrl?: str
                 signIn("google", { callbackUrl });
               }}
               variant="outline"
-              className="rounded-full"
+              className="rounded-none"
             >
               <Shield className="h-4 w-4 mr-2" /> Sign in with Google
             </Button>
@@ -235,7 +235,7 @@ export function BloomDashboardPlaceholder({ botInviteUrl }: { botInviteUrl?: str
                 const callbackUrl = `${window.location.origin}/#dashboard`;
                 signIn("discord", { callbackUrl });
               }}
-              className="rounded-full bg-foreground text-background hover:bg-foreground/90"
+              className="rounded-none bg-foreground text-background hover:bg-foreground/90"
             >
               <Bot className="h-4 w-4 mr-2" /> Sign in with Discord
             </Button>
@@ -250,7 +250,7 @@ export function BloomDashboardPlaceholder({ botInviteUrl }: { botInviteUrl?: str
       <div className="pt-4 pb-24 min-h-screen">
         <div className="mx-auto max-w-4xl px-4 sm:px-6 lg:px-8">
           <div className="space-y-3">
-            {Array.from({ length: 3 }).map((_, i) => <Skeleton key={i} className="h-20 rounded-xl" />)}
+            {Array.from({ length: 3 }).map((_, i) => <Skeleton key={i} className="h-20 rounded-sm" />)}
           </div>
         </div>
       </div>
@@ -275,7 +275,7 @@ export function BloomDashboardPlaceholder({ botInviteUrl }: { botInviteUrl?: str
             </p>
 
             {!botConfigured && (
-              <div className="mt-4 rounded-xl border border-amber-500/40 bg-amber-500/10 p-4 flex items-start gap-3">
+              <div className="mt-4 rounded-sm border border-amber-500/40 bg-amber-500/10 p-4 flex items-start gap-3">
                 <AlertCircle className="h-5 w-5 text-amber-500 flex-shrink-0 mt-0.5" />
                 <div className="text-sm text-amber-700 dark:text-amber-300">
                   <div className="font-medium mb-1">Bot connection not configured</div>
@@ -290,7 +290,7 @@ export function BloomDashboardPlaceholder({ botInviteUrl }: { botInviteUrl?: str
 
             <div className="mt-6 space-y-3">
               {guilds.length === 0 ? (
-                <div className="rounded-xl border border-dashed border-border p-8 text-center">
+                <div className="rounded-sm border border-dashed border-border p-8 text-center">
                   <AlertCircle className="h-8 w-8 mx-auto mb-2 text-muted-foreground" />
                   <div className="text-sm font-medium mb-1">No servers to manage</div>
                   <div className="text-xs text-muted-foreground mb-4">
@@ -298,7 +298,7 @@ export function BloomDashboardPlaceholder({ botInviteUrl }: { botInviteUrl?: str
                   </div>
                   {botInviteUrl && (
                     <a href={botInviteUrl} target="_blank" rel="noopener noreferrer">
-                      <Button className="rounded-full bg-foreground text-background hover:bg-foreground/90">
+                      <Button className="rounded-none bg-foreground text-background hover:bg-foreground/90">
                         <Bot className="h-4 w-4 mr-2" /> Add Bloom to your server
                       </Button>
                     </a>
@@ -309,9 +309,9 @@ export function BloomDashboardPlaceholder({ botInviteUrl }: { botInviteUrl?: str
                   <button
                     key={g.id}
                     onClick={() => loadConfig(g.id)}
-                    className="w-full text-left rounded-2xl border border-border bg-card p-4 hover:border-[var(--fubrio-accent)]/40 transition-all flex items-center gap-4"
+                    className="w-full text-left rounded-none border border-border bg-card p-4 hover:border-[var(--fubrio-accent)]/40 transition-all flex items-center gap-4"
                   >
-                    <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-gradient-to-br from-secondary to-muted text-base font-semibold flex-shrink-0 overflow-hidden">
+                    <div className="flex h-12 w-12 items-center justify-center rounded-sm bg-gradient-to-br from-secondary to-muted text-base font-semibold flex-shrink-0 overflow-hidden">
                       {g.icon ? <img src={g.icon} alt="" className="h-full w-full object-cover" /> : g.name.slice(0, 2).toUpperCase()}
                     </div>
                     <div className="min-w-0 flex-1">
@@ -343,7 +343,7 @@ export function BloomDashboardPlaceholder({ botInviteUrl }: { botInviteUrl?: str
 
             {loadingConfig ? (
               <div className="space-y-3">
-                {Array.from({ length: 3 }).map((_, i) => <Skeleton key={i} className="h-24 rounded-xl" />)}
+                {Array.from({ length: 3 }).map((_, i) => <Skeleton key={i} className="h-24 rounded-sm" />)}
               </div>
             ) : configState === "loaded" && config ? (
               <>
@@ -394,7 +394,7 @@ export function BloomDashboardPlaceholder({ botInviteUrl }: { botInviteUrl?: str
                             onClick={savePrefix}
                             disabled={savingPrefix || prefix === (config.prefix ?? "!")}
                             size="sm"
-                            className="rounded-full bg-foreground text-background hover:bg-foreground/90"
+                            className="rounded-none bg-foreground text-background hover:bg-foreground/90"
                           >
                             {savingPrefix ? <Loader2 className="h-4 w-4 animate-spin" /> : <Check className="h-4 w-4" />}
                           </Button>
@@ -592,7 +592,7 @@ export function BloomDashboardPlaceholder({ botInviteUrl }: { botInviteUrl?: str
                 <div className="text-sm text-muted-foreground mb-6 max-w-sm mx-auto">{configMessage}</div>
                 {botInviteUrl && (
                   <a href={botInviteUrl} target="_blank" rel="noopener noreferrer">
-                    <Button className="rounded-full bg-foreground text-background hover:bg-foreground/90">
+                    <Button className="rounded-none bg-foreground text-background hover:bg-foreground/90">
                       <Bot className="h-4 w-4 mr-2" /> Add Bloom to this server
                     </Button>
                   </a>
@@ -603,7 +603,7 @@ export function BloomDashboardPlaceholder({ botInviteUrl }: { botInviteUrl?: str
                 <AlertCircle className="h-12 w-12 mx-auto mb-3 text-amber-500" />
                 <div className="font-display text-xl font-semibold mb-2">Bot not connected</div>
                 <div className="text-sm text-muted-foreground mb-6 max-w-md mx-auto">{configMessage}</div>
-                <div className="text-xs text-muted-foreground bg-secondary border border-border rounded-lg p-3 max-w-md mx-auto">
+                <div className="text-xs text-muted-foreground bg-secondary border border-border rounded-sm p-3 max-w-md mx-auto">
                   Set these env vars on Netlify:
                   <br />
                   <code className="font-mono text-[var(--fubrio-accent)]">BLOOM_BOT_API_URL</code> = your bot's URL
@@ -623,7 +623,7 @@ export function BloomDashboardPlaceholder({ botInviteUrl }: { botInviteUrl?: str
                     const callbackUrl = `${window.location.origin}/#dashboard`;
                     signIn("discord", { callbackUrl });
                   }}
-                  className="rounded-full bg-foreground text-background hover:bg-foreground/90"
+                  className="rounded-none bg-foreground text-background hover:bg-foreground/90"
                 >
                   <Bot className="h-4 w-4 mr-2" /> Sign in again
                 </Button>
@@ -635,7 +635,7 @@ export function BloomDashboardPlaceholder({ botInviteUrl }: { botInviteUrl?: str
                 <div className="text-sm text-muted-foreground mb-6 max-w-sm mx-auto">{configMessage}</div>
                 <Button
                   variant="outline"
-                  className="rounded-full"
+                  className="rounded-none"
                   onClick={() => activeGuildId && loadConfig(activeGuildId)}
                 >
                   Try again
@@ -675,7 +675,7 @@ function ToggleRow({ label, desc, checked, onChange, saving, disabled }: {
   disabled?: boolean;
 }) {
   return (
-    <div className={cn("flex items-center justify-between gap-4 p-3 rounded-lg", disabled ? "opacity-50" : "")}>
+    <div className={cn("flex items-center justify-between gap-4 p-3 rounded-sm", disabled ? "opacity-50" : "")}>
       <div className="min-w-0 flex-1">
         <div className="text-sm font-medium">{label}</div>
         <div className="text-xs text-muted-foreground">{desc}</div>

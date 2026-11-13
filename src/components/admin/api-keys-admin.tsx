@@ -64,7 +64,7 @@ function formatDate(iso: string | null): string {
 
 const TYPE_META: Record<string, { label: string; icon: any }> = {
   announcements: { label: "Announcements", icon: Bell },
-  ai: { label: "Wisee AI 1.0", icon: Sparkles },
+  ai: { label: "Fubrio AI", icon: Sparkles },
   ads: { label: "Fubrio Ads", icon: Megaphone },
 };
 
@@ -168,7 +168,7 @@ export function ApiKeysAdmin() {
       <div className="grid grid-cols-2 sm:grid-cols-5 gap-3 mb-6">
         <StatChip icon={<Key className="h-4 w-4" />} label="Total keys" value={stats.total} />
         <StatChip icon={<Bell className="h-4 w-4 text-[var(--fubrio-accent)]" />} label="Announcements" value={stats.announcements} accent />
-        <StatChip icon={<Sparkles className="h-4 w-4 text-purple-500" />} label="Wisee AI" value={stats.ai} />
+        <StatChip icon={<Sparkles className="h-4 w-4 text-purple-500" />} label="Fubrio AI" value={stats.ai} />
         <StatChip icon={<Megaphone className="h-4 w-4 text-blue-500" />} label="Ads" value={stats.ads} />
         <StatChip icon={<ShieldCheck className="h-4 w-4" />} label="Active" value={stats.active} />
       </div>
@@ -187,9 +187,9 @@ export function ApiKeysAdmin() {
               variant={typeFilter === t ? "default" : "outline"}
               size="sm"
               onClick={() => setTypeFilter(t)}
-              className="rounded-full capitalize"
+              className="rounded-none capitalize"
             >
-              {t === "ai" ? "Wisee AI" : t === "ads" ? "Ads" : t}
+              {t === "ai" ? "Fubrio AI" : t === "ads" ? "Ads" : t}
             </Button>
           ))}
         </div>
@@ -210,7 +210,7 @@ export function ApiKeysAdmin() {
               return (
                 <div key={k.id} className="p-4 hover:bg-accent/30 transition-colors">
                   <div className="flex flex-col sm:flex-row sm:items-start gap-3">
-                    <div className="flex h-9 w-9 items-center justify-center rounded-full glass-card flex-shrink-0">
+                    <div className="flex h-9 w-9 items-center justify-center rounded-none glass-card flex-shrink-0">
                       <meta.icon className="h-3.5 w-3.5 text-[var(--fubrio-accent)]" />
                     </div>
                     <div className="min-w-0 flex-1">
@@ -252,14 +252,14 @@ export function ApiKeysAdmin() {
                       <Button
                         size="sm"
                         variant="outline"
-                        className="rounded-full"
+                        className="rounded-none"
                         onClick={() => setActiveKeyId((id) => (id === k.id ? null : k.id))}
                       >
                         {activeKeyId === k.id ? "Hide logs" : "View logs"}
                       </Button>
                       <DropdownMenu>
                         <DropdownMenuTrigger asChild>
-                          <Button size="sm" variant="ghost" className="rounded-full">
+                          <Button size="sm" variant="ghost" className="rounded-none">
                             Status <ChevronDown className="h-3 w-3 ml-1" />
                           </Button>
                         </DropdownMenuTrigger>
@@ -272,7 +272,7 @@ export function ApiKeysAdmin() {
                       <Button
                         size="sm"
                         variant="ghost"
-                        className="rounded-full text-destructive hover:text-destructive"
+                        className="rounded-none text-destructive hover:text-destructive"
                         onClick={() => setDeleteId(k.id)}
                       >
                         <Trash2 className="h-3.5 w-3.5" />
@@ -281,7 +281,7 @@ export function ApiKeysAdmin() {
                   </div>
 
                   {activeKeyId === k.id && (
-                    <div className="mt-3 rounded-lg border border-border bg-background p-3 max-h-64 overflow-y-auto">
+                    <div className="mt-3 rounded-sm border border-border bg-background p-3 max-h-64 overflow-y-auto">
                       {filteredLogs.length === 0 ? (
                         <div className="text-xs text-muted-foreground text-center py-4">
                           No log entries for this key yet.
@@ -335,7 +335,7 @@ export function ApiKeysAdmin() {
 
 function StatChip({ icon, label, value, accent }: { icon: React.ReactNode; label: string; value: number; accent?: boolean }) {
   return (
-    <div className="rounded-xl glass-card p-4">
+    <div className="rounded-sm glass-card p-4">
       <div className="flex items-center gap-2">
         {icon}
         <div className="text-xs uppercase tracking-wider text-muted-foreground">{label}</div>

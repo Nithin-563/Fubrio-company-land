@@ -5,15 +5,13 @@ import { useSession, signOut } from "next-auth/react";
 import {
   LayoutDashboard, FolderKanban, Package, Wrench, Sparkles, Handshake,
   FileText, Users, Image as ImageIcon, Inbox, Settings as SettingsIcon,
-  LogOut, Menu, X, ChevronRight, ShieldCheck, FileEdit, Star, HelpCircle,
-  Calendar, Server, ListTree, PanelLeftClose, PanelLeft, Link2, Mail, Heart, TrendingUp,
-  UserCog, Bell, MessageCircle, Key, FlaskConical, Crown, Headset, Bug, Bot,
+  LogOut, Menu, X, ArrowUpRight, ShieldCheck, FileEdit, Star, HelpCircle,
+  Calendar, Server, ListTree, Link2, Mail, Heart, TrendingUp,
+  UserCog, Bell, MessageCircle, Key, FlaskConical, Crown, Headset, Bug, Bot, KeyRound,
 } from "lucide-react";
-import { Logo } from "@/components/shared/logo";
 import { ThemeToggle } from "@/components/shared/theme-toggle";
 import { NotificationBell } from "@/components/admin/notification-bell";
 import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
 import { cn } from "@/lib/utils";
 import { navigate } from "@/lib/router";
 import { can, userCanAccessSection } from "@/lib/types";
@@ -31,6 +29,7 @@ export type AdminSection =
 
 const NAV: Array<{ id: AdminSection; label: string; icon: React.ComponentType<{ className?: string }>; perm?: string; group: string }> = [
   { id: "overview", label: "Overview", icon: LayoutDashboard, group: "Main" },
+  { id: "employees", label: "Employees", icon: UserCog, perm: "settings.manage", group: "Main" },
   { id: "projects", label: "Showcase", icon: FolderKanban, perm: "content.manage", group: "Content" },
   { id: "products", label: "Products", icon: Package, perm: "content.manage", group: "Content" },
   { id: "services", label: "Services", icon: Wrench, perm: "content.manage", group: "Content" },
@@ -55,10 +54,9 @@ const NAV: Array<{ id: AdminSection; label: string; icon: React.ComponentType<{ 
   { id: "media", label: "Media Library", icon: ImageIcon, perm: "media.manage", group: "Assets" },
   { id: "inquiries", label: "Inquiries", icon: Inbox, perm: "inquiries.manage", group: "Communication" },
   { id: "users", label: "Users", icon: Users, perm: "users.manage", group: "System" },
-  { id: "employees", label: "Employees", icon: UserCog, perm: "settings.manage", group: "System" },
   { id: "chat", label: "Chat", icon: MessageCircle, perm: "content.manage", group: "Communication" },
   { id: "apiKeys", label: "API Keys", icon: Key, perm: "settings.manage", group: "System" },
-  { id: "example", label: "Example", icon: FlaskConical, perm: "content.manage", group: "System" },
+  { id: "example", label: "API Playground", icon: FlaskConical, perm: "content.manage", group: "System" },
   { id: "customerChat", label: "Customer Chat", icon: Headset, perm: "content.manage", group: "Communication" },
   { id: "bugReports", label: "Bug Reports", icon: Bug, perm: "content.manage", group: "Communication" },
   { id: "bloomStats", label: "Bloom Stats", icon: Bot, perm: "content.manage", group: "System" },
@@ -80,7 +78,11 @@ export function AdminShell({ active, onChange, children }: Props) {
   const permissions = (session?.user as { permissions?: EmployeePermissions } | undefined)?.permissions;
 
   if (status === "loading") {
-    return <div className="min-h-screen flex items-center justify-center text-muted-foreground">Loading…</div>;
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <span className="eyebrow">Loading</span>
+      </div>
+    );
   }
   if (!session) return null;
 
@@ -93,8 +95,9 @@ export function AdminShell({ active, onChange, children }: Props) {
     return !n.perm || can(role, n.perm);
   });
   const groups = Array.from(new Set(visibleNav.map((n) => n.group)));
-
   const isActiveAllowed = visibleNav.some((n) => n.id === active);
+  const canCzer = role === "SUPER_ADMIN";
+  const activeLabel = NAV.find((n) => n.id === active)?.label ?? "Admin";
 
   const handleNav = (s: AdminSection) => {
     onChange(s);
@@ -103,50 +106,62 @@ export function AdminShell({ active, onChange, children }: Props) {
 
   return (
     <div className="min-h-screen bg-background">
-      <header className="sticky top-0 z-40 border-b border-border bg-background/80 backdrop-blur">
+      <header className="sticky top-0 z-40 border-b border-border bg-background">
         <div className="flex h-14 items-center justify-between gap-3 px-4">
           <div className="flex items-center gap-3">
-            <Button
-              variant="ghost"
-              size="icon"
-              className="lg:hidden rounded-full"
+            <button
+              className="lg:hidden -ml-1 p-1.5 text-muted-foreground hover:text-foreground"
               onClick={() => setSidebarOpen((s) => !s)}
               aria-label="Toggle sidebar"
             >
               {sidebarOpen ? <X className="h-4 w-4" /> : <Menu className="h-4 w-4" />}
-            </Button>
-            <button onClick={() => navigate("#home")} className="hidden sm:block">
-              <Logo size="sm" />
             </button>
-            <Badge variant="outline" className="hidden sm:inline-flex">
-              <ShieldCheck className="h-3 w-3 mr-1 text-[var(--fubrio-accent)]" />
-              {role}
-            </Badge>
+            <button onClick={() => navigate("#home")} className="flex items-baseline gap-1.5">
+              <span className="font-display text-lg leading-none tracking-tight">Fubrio</span>
+              <span className="h-1.5 w-1.5 translate-y-[-2px] bg-[var(--fubrio-accent)]" aria-hidden />
+            </button>
+            <span className="hidden sm:inline text-muted-foreground/40">/</span>
+            <span className="hidden sm:inline text-xs text-muted-foreground">{activeLabel}</span>
           </div>
-          <div className="flex items-center gap-2">
-            <Button variant="ghost" size="sm" onClick={() => navigate("#home")} className="rounded-full hidden sm:inline-flex">
-              View site
-            </Button>
+
+          <div className="flex items-center gap-1.5">
+            <span className="hidden md:inline-flex items-center gap-1.5 border border-border px-2 py-1 text-[10px] uppercase tracking-[0.14em] text-muted-foreground">
+              <ShieldCheck className="h-3 w-3 text-[var(--fubrio-accent)]" />
+              {role.replace("_", " ")}
+            </span>
+            {canCzer && (
+              <button
+                onClick={() => navigate("#czer")}
+                className="hidden sm:inline-flex items-center gap-1.5 border border-border px-2 py-1 text-[10px] uppercase tracking-[0.14em] text-muted-foreground hover:border-foreground hover:text-foreground transition-colors"
+                title="Czer access"
+              >
+                <KeyRound className="h-3 w-3" /> Czer
+              </button>
+            )}
+            <button
+              onClick={() => navigate("#home")}
+              className="hidden sm:inline-flex items-center gap-1 px-2 py-1 text-[10px] uppercase tracking-[0.14em] text-muted-foreground hover:text-foreground transition-colors"
+            >
+              View site <ArrowUpRight className="h-3 w-3" />
+            </button>
             <NotificationBell />
             <ThemeToggle />
-            <div className="hidden sm:flex items-center gap-2 pl-3 border-l border-border">
-              <div className="flex h-8 w-8 items-center justify-center rounded-full bg-gradient-to-br from-secondary to-muted text-xs font-semibold">
+            <div className="hidden sm:flex items-center gap-2 pl-3 ml-1 border-l border-border">
+              <div className="flex h-7 w-7 items-center justify-center border border-border text-[11px] font-medium">
                 {(session.user?.name ?? session.user?.email ?? "A").slice(0, 1).toUpperCase()}
               </div>
-              <div className="text-xs">
-                <div className="font-medium leading-none">{session.user?.name ?? "User"}</div>
-                <div className="text-muted-foreground mt-0.5">{session.user?.email}</div>
+              <div className="leading-tight">
+                <div className="text-[11px] font-medium">{session.user?.name ?? "User"}</div>
+                <div className="text-[10px] text-muted-foreground">{session.user?.email}</div>
               </div>
             </div>
-            <Button
-              variant="ghost"
-              size="icon"
-              className="rounded-full"
+            <button
+              className="p-1.5 text-muted-foreground hover:text-foreground transition-colors"
               onClick={() => signOut({ callbackUrl: "/" }).then(() => toast.success("Signed out"))}
               aria-label="Sign out"
             >
               <LogOut className="h-4 w-4" />
-            </Button>
+            </button>
           </div>
         </div>
       </header>
@@ -154,58 +169,54 @@ export function AdminShell({ active, onChange, children }: Props) {
       <div className="flex">
         <aside
           className={cn(
-            "fixed lg:sticky top-14 inset-y-0 lg:top-14 lg:translate-x-0 z-30 w-64 shrink-0 border-r border-border bg-background h-[calc(100vh-3.5rem)] overflow-y-auto transition-transform",
+            "fixed lg:sticky top-14 inset-y-0 lg:top-14 lg:translate-x-0 z-30 w-60 shrink-0 border-r border-border bg-background h-[calc(100vh-3.5rem)] overflow-y-auto transition-transform",
             sidebarOpen ? "translate-x-0" : "-translate-x-full",
           )}
         >
-          <nav className="p-3 space-y-4">
+          <nav className="py-4">
             {groups.map((g) => (
-              <div key={g}>
-                <div className="px-3 mb-1 text-[10px] uppercase tracking-wider text-muted-foreground font-semibold">{g}</div>
-                {visibleNav.filter((n) => n.group === g).map((n) => (
-                  <button
-                    key={n.id}
-                    onClick={() => handleNav(n.id)}
-                    className={cn(
-                      "flex w-full items-center gap-2.5 rounded-lg px-3 py-2 text-sm transition-colors",
-                      active === n.id
-                        ? "bg-[var(--fubrio-accent-soft)] text-foreground border border-[var(--fubrio-accent)]/30"
-                        : "text-muted-foreground hover:bg-accent hover:text-foreground border border-transparent",
-                    )}
-                  >
-                    <n.icon className="h-4 w-4 flex-shrink-0" />
-                    <span className="flex-1 text-left">{n.label}</span>
-                    {active === n.id && <ChevronRight className="h-3 w-3" />}
-                  </button>
-                ))}
+              <div key={g} className="mb-5">
+                <div className="px-4 mb-1.5 text-[10px] uppercase tracking-[0.16em] text-muted-foreground/60">{g}</div>
+                <div>
+                  {visibleNav.filter((n) => n.group === g).map((n) => {
+                    const isActive = active === n.id;
+                    return (
+                      <button
+                        key={n.id}
+                        onClick={() => handleNav(n.id)}
+                        className={cn(
+                          "group flex w-full items-center gap-2.5 border-l-2 px-4 py-[7px] text-[13px] transition-colors",
+                          isActive
+                            ? "border-[var(--fubrio-accent)] bg-secondary/50 text-foreground"
+                            : "border-transparent text-muted-foreground hover:text-foreground hover:bg-secondary/30",
+                        )}
+                      >
+                        <n.icon className={cn("h-3.5 w-3.5 flex-shrink-0", isActive && "text-[var(--fubrio-accent)]")} />
+                        <span className="flex-1 text-left">{n.label}</span>
+                      </button>
+                    );
+                  })}
+                </div>
               </div>
             ))}
           </nav>
-          <div className="p-3 mt-auto">
-            <Button variant="ghost" size="sm" className="w-full justify-start text-xs text-muted-foreground hover:text-foreground" onClick={() => setSidebarOpen(false)}>
-              <PanelLeftClose className="h-3.5 w-3.5 mr-1.5" />
-              Collapse
-            </Button>
-          </div>
         </aside>
 
         {sidebarOpen && (
-          <div className="fixed inset-0 top-14 z-20 bg-background/60 lg:hidden" onClick={() => setSidebarOpen(false)} />
+          <div
+            className="fixed inset-0 top-14 z-20 bg-foreground/25 lg:hidden"
+            onClick={() => setSidebarOpen(false)}
+          />
         )}
 
         <main className="flex-1 min-w-0">
-          <div className="p-4 sm:p-6 lg:p-8">
+          <div className="px-4 py-6 sm:px-6 sm:py-8 lg:px-10 lg:py-10">
             {isActiveAllowed ? children : (
-              <div className="rounded-xl border border-dashed border-border p-12 text-center">
-                <div className="text-sm text-muted-foreground">
+              <div className="border border-dashed border-border px-6 py-16 text-center">
+                <p className="text-sm text-muted-foreground">
                   You don&apos;t have access to this section. Pick another from the sidebar.
-                </div>
-                <Button
-                  variant="outline"
-                  size="sm"
-                  className="mt-4 rounded-full"
-                  onClick={() => handleNav("overview")}
-                >
+                </p>
+                <Button variant="outline" size="sm" className="mt-4" onClick={() => handleNav("overview")}>
                   Go to overview
                 </Button>
               </div>
@@ -219,12 +230,14 @@ export function AdminShell({ active, onChange, children }: Props) {
 
 export function SectionHeader({ title, desc, action }: { title: string; desc?: string; action?: React.ReactNode }) {
   return (
-    <div className="flex items-start justify-between gap-4 mb-6">
-      <div>
-        <h1 className="font-display text-2xl sm:text-3xl font-semibold">{title}</h1>
-        {desc && <p className="text-sm text-muted-foreground mt-1">{desc}</p>}
+    <div className="mb-7 border-b border-border pb-4">
+      <div className="flex flex-wrap items-end justify-between gap-3">
+        <div>
+          <h1 className="font-display text-[1.75rem] leading-none tracking-tight sm:text-[2rem]">{title}</h1>
+          {desc && <p className="mt-2 max-w-2xl text-[13px] leading-relaxed text-muted-foreground">{desc}</p>}
+        </div>
+        {action}
       </div>
-      {action}
     </div>
   );
 }

@@ -20,9 +20,12 @@ export function FloatingAnnouncementsButton() {
   useEffect(() => {
     try {
       const saved = localStorage.getItem("fubrio_announcement_bubble_pos");
-      if (saved) {
-        const p = JSON.parse(saved);
-        if (typeof p.x === "number" && typeof p.y === "number") setPos(p);
+      const p = saved ? JSON.parse(saved) : null;
+      if (p && typeof p.x === "number" && typeof p.y === "number") {
+        setPos(clamp(p.x, p.y));
+      } else {
+        // Sit in the lower-left corner by default, clear of the header and the footer links.
+        setPos(clamp(20, window.innerHeight - 88));
       }
     } catch {}
 
@@ -48,7 +51,7 @@ export function FloatingAnnouncementsButton() {
     if (typeof window === "undefined") return { x, y };
     const w = window.innerWidth;
     const h = window.innerHeight;
-    const size = 56;
+    const size = 44;
     return {
       x: Math.max(8, Math.min(w - size - 8, x)),
       y: Math.max(8, Math.min(h - size - 8, y)),
@@ -114,21 +117,19 @@ export function FloatingAnnouncementsButton() {
         onPointerDown={onMouseDown}
         onPointerMove={onMouseMove}
         onPointerUp={onMouseUp}
-        className="relative flex h-14 w-14 items-center justify-center rounded-full glass-strong shadow-xl border border-border hover:scale-105 transition-transform cursor-grab active:cursor-grabbing"
+        className="relative flex h-11 w-11 cursor-grab items-center justify-center border border-border bg-background transition-transform hover:border-foreground active:cursor-grabbing"
         style={{
-          boxShadow: hasNew
-            ? "0 0 0 4px var(--fubrio-accent-soft), 0 12px 32px -8px var(--fubrio-accent)"
-            : undefined,
+          boxShadow: hasNew ? "2px 2px 0 0 var(--fubrio-accent)" : undefined,
         }}
       >
         <Bell className={`h-5 w-5 ${hasNew ? "text-[var(--fubrio-accent)]" : "text-foreground"} ${hasNew ? "animate-swing" : ""}`} />
         {hasNew && (
-          <span className="absolute -top-1 -right-1 flex h-4 w-4 items-center justify-center rounded-full bg-[var(--fubrio-accent)] text-white text-[9px] font-bold">
+          <span className="absolute -right-1 -top-1 flex h-3.5 w-3.5 items-center justify-center bg-[var(--fubrio-accent)] font-mono text-[9px] font-bold text-white">
             !
           </span>
         )}
       </button>
-      <div className="absolute left-1/2 -translate-x-1/2 top-full mt-2 px-2 py-1 rounded-md bg-foreground text-background text-[10px] font-medium opacity-0 hover:opacity-100 transition-opacity pointer-events-none whitespace-nowrap">
+      <div className="pointer-events-none absolute left-1/2 top-full mt-2 -translate-x-1/2 whitespace-nowrap bg-foreground px-2 py-1 font-mono text-[10px] uppercase tracking-[0.08em] text-background opacity-0 transition-opacity hover:opacity-100">
         Announcements · drag to move
       </div>
       <style jsx>{`

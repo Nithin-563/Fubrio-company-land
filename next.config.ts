@@ -3,12 +3,22 @@ import type { NextConfig } from "next";
 const nextConfig: NextConfig = {
   output: "standalone",
   poweredByHeader: false,
+  compress: true,
   typescript: {
     ignoreBuildErrors: true,
   },
   reactStrictMode: false,
+  // Tree-shake big icon/util barrels instead of pulling the whole package in.
+  experimental: {
+    optimizePackageImports: ["lucide-react", "date-fns", "recharts"],
+  },
   async headers() {
     return [
+      {
+        // Brand images never change name, so let them sit in the browser cache.
+        source: "/:path(fubrio-logo.png|og-image.png|favicon.ico|apple-touch-icon.png)",
+        headers: [{ key: "Cache-Control", value: "public, max-age=604800, stale-while-revalidate=86400" }],
+      },
       {
         source: "/(.*)",
         headers: [

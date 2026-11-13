@@ -47,8 +47,8 @@ const API_TYPES = [
   },
   {
     id: "ai",
-    label: "Wisee AI 1.0",
-    description: "Call the Wisee AI 1.0 chat completion endpoint from your code.",
+    label: "Fubrio AI",
+    description: "Call the Fubrio AI chat completion endpoint from your code.",
     icon: Sparkles,
     accent: "purple",
   },
@@ -211,7 +211,7 @@ export function ApiKeysView() {
             API key creation requires Google authentication. Sign in with your Google account to continue.
           </p>
           <div className="mt-8">
-            <Button onClick={startGoogleSignIn} className="rounded-full bg-foreground text-background hover:bg-foreground/90">
+            <Button onClick={startGoogleSignIn} className="rounded-none bg-foreground text-background hover:bg-foreground/90">
               <Shield className="h-4 w-4 mr-2" />
               Sign in with Google
             </Button>
@@ -233,7 +233,7 @@ export function ApiKeysView() {
             API Keys
           </div>
           <h1 className="display-heading mt-2 text-4xl sm:text-5xl">Google authentication required</h1>
-          <div className="mt-4 rounded-2xl border border-amber-500/40 bg-amber-500/10 p-5 flex items-start gap-3">
+          <div className="mt-4 rounded-none border border-amber-500/40 bg-amber-500/10 p-5 flex items-start gap-3">
             <AlertTriangle className="h-5 w-5 text-amber-500 flex-shrink-0 mt-0.5" />
             <div className="text-sm">
               <div className="font-medium text-amber-700 dark:text-amber-300 mb-1">Signed in via a different method</div>
@@ -245,14 +245,14 @@ export function ApiKeysView() {
             </div>
           </div>
           <div className="mt-6 flex gap-3">
-            <Button onClick={startGoogleSignIn} className="rounded-full bg-foreground text-background hover:bg-foreground/90">
+            <Button onClick={startGoogleSignIn} className="rounded-none bg-foreground text-background hover:bg-foreground/90">
               <Shield className="h-4 w-4 mr-2" />
               Sign in with Google instead
             </Button>
             <Button
               variant="outline"
               onClick={() => signOut({ callbackUrl: "/" })}
-              className="rounded-full"
+              className="rounded-none"
             >
               Sign out
             </Button>
@@ -275,16 +275,16 @@ export function ApiKeysView() {
         </div>
         <h1 className="display-heading mt-2 text-4xl sm:text-5xl">Your API Keys</h1>
         <p className="mt-2 text-muted-foreground">
-          Create keys to integrate Fubrio announcements or Wisee AI 1.0 into your projects. See the{" "}
+          Create keys to integrate Fubrio announcements or Fubrio AI into your projects. See the{" "}
           <button onClick={() => navigate("#docs")} className="text-foreground underline-offset-2 hover:underline inline-flex items-center gap-1">
             docs <ExternalLink className="h-3 w-3" />
           </button>{" "}
           for wiring instructions.
         </p>
 
-        <div className="mt-6 rounded-2xl border border-border bg-secondary/30 p-4 flex items-center justify-between gap-3">
+        <div className="mt-6 rounded-none border border-border bg-secondary/30 p-4 flex items-center justify-between gap-3">
           <div className="flex items-center gap-3">
-            <div className="flex h-9 w-9 items-center justify-center rounded-full bg-[var(--fubrio-accent-soft)] border border-[var(--fubrio-accent)]/30">
+            <div className="flex h-9 w-9 items-center justify-center rounded-none bg-[var(--fubrio-accent-soft)] border border-[var(--fubrio-accent)]/30">
               <Clock className="h-4 w-4 text-[var(--fubrio-accent)]" />
             </div>
             <div>
@@ -302,7 +302,7 @@ export function ApiKeysView() {
               setShowForm(true);
             }}
             disabled={dailyRemaining === 0}
-            className="rounded-full bg-foreground text-background hover:bg-foreground/90"
+            className="rounded-none bg-foreground text-background hover:bg-foreground/90"
           >
             <Plus className="h-4 w-4 mr-1.5" /> New API key
           </Button>
@@ -310,9 +310,9 @@ export function ApiKeysView() {
 
         <div className="mt-8 space-y-3">
           {loading ? (
-            Array.from({ length: 2 }).map((_, i) => <Skeleton key={i} className="h-32 rounded-xl" />)
+            Array.from({ length: 2 }).map((_, i) => <Skeleton key={i} className="h-32 rounded-sm" />)
           ) : keys.length === 0 ? (
-            <div className="rounded-xl border border-dashed border-border py-16 text-center">
+            <div className="rounded-sm border border-dashed border-border py-16 text-center">
               <Key className="h-8 w-8 mx-auto mb-2 opacity-50" />
               <div className="font-display text-lg font-semibold">No API keys yet</div>
               <div className="mt-1 text-sm text-muted-foreground">
@@ -323,9 +323,9 @@ export function ApiKeysView() {
             keys.map((k) => {
               const typeMeta = API_TYPES.find((t) => t.id === k.type);
               return (
-                <div key={k.id} className="rounded-2xl border border-border bg-card p-5">
+                <div key={k.id} className="rounded-none border border-border bg-card p-5">
                   <div className="flex flex-col sm:flex-row sm:items-start gap-3">
-                    <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-[var(--fubrio-accent-soft)] border border-[var(--fubrio-accent)]/30 flex-shrink-0">
+                    <div className="flex h-10 w-10 items-center justify-center rounded-sm bg-[var(--fubrio-accent-soft)] border border-[var(--fubrio-accent)]/30 flex-shrink-0">
                       {typeMeta ? <typeMeta.icon className="h-4 w-4 text-[var(--fubrio-accent)]" /> : <Key className="h-4 w-4" />}
                     </div>
                     <div className="flex-1 min-w-0">
@@ -365,7 +365,7 @@ export function ApiKeysView() {
                     <Button
                       variant="ghost"
                       size="sm"
-                      className="rounded-full text-destructive hover:text-destructive flex-shrink-0"
+                      className="rounded-none text-destructive hover:text-destructive flex-shrink-0"
                       onClick={() => setDeleteId(k.id)}
                     >
                       <Trash2 className="h-3.5 w-3.5 mr-1" /> Revoke
@@ -382,7 +382,7 @@ export function ApiKeysView() {
             <div className="text-xs text-muted-foreground">
               Signed in as <strong>{(session.user as { email?: string }).email}</strong> (Google)
             </div>
-            <Button variant="ghost" size="sm" onClick={() => signOut({ callbackUrl: "/" })} className="rounded-full">
+            <Button variant="ghost" size="sm" onClick={() => signOut({ callbackUrl: "/" })} className="rounded-none">
               Sign out
             </Button>
           </div>
@@ -407,7 +407,7 @@ export function ApiKeysView() {
                     type="button"
                     onClick={() => setForm({ ...form, type: t.id })}
                     className={cn(
-                      "rounded-lg border p-3 text-left transition-colors",
+                      "rounded-sm border p-3 text-left transition-colors",
                       form.type === t.id
                         ? "border-[var(--fubrio-accent)] bg-[var(--fubrio-accent-soft)]"
                         : "border-border hover:bg-accent/40",
@@ -481,7 +481,7 @@ export function ApiKeysView() {
           </DialogHeader>
           {createdKey && (
             <div className="space-y-3 py-2">
-              <div className="rounded-lg border border-border bg-secondary p-3">
+              <div className="rounded-sm border border-border bg-secondary p-3">
                 <div className="flex items-center gap-2">
                   <code className={cn("font-mono text-xs flex-1 break-all", !showPlaintext && "blur-sm select-none")}>
                     {createdKey.key}
@@ -490,7 +490,7 @@ export function ApiKeysView() {
                     type="button"
                     size="icon"
                     variant="ghost"
-                    className="rounded-full flex-shrink-0"
+                    className="rounded-none flex-shrink-0"
                     onClick={() => setShowPlaintext((s) => !s)}
                   >
                     {showPlaintext ? <EyeOff className="h-3.5 w-3.5" /> : <Eye className="h-3.5 w-3.5" />}
@@ -499,14 +499,14 @@ export function ApiKeysView() {
                     type="button"
                     size="icon"
                     variant="ghost"
-                    className="rounded-full flex-shrink-0"
+                    className="rounded-none flex-shrink-0"
                     onClick={copyKey}
                   >
                     {copied ? <Check className="h-3.5 w-3.5 text-[var(--fubrio-accent)]" /> : <Copy className="h-3.5 w-3.5" />}
                   </Button>
                 </div>
               </div>
-              <div className="rounded-lg border border-amber-500/40 bg-amber-500/10 p-3 text-xs text-amber-700 dark:text-amber-300">
+              <div className="rounded-sm border border-amber-500/40 bg-amber-500/10 p-3 text-xs text-amber-700 dark:text-amber-300">
                 <strong>Important:</strong> This is the only time you&apos;ll see this key. Store it securely.
                 If you lose it, you&apos;ll need to revoke and create a new one.
               </div>

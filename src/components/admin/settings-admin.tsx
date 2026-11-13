@@ -63,6 +63,17 @@ const SETTING_GROUPS: Array<{ title: string; keys: Array<{ key: string; label: s
     ],
   },
   {
+    title: "AI API",
+    keys: [
+      { key: "ai.provider", label: "Provider (openai | gemini | anthropic)", placeholder: "openai" },
+      { key: "ai.baseUrl", label: "Base URL (any OpenAI-compatible endpoint)", placeholder: "https://api.openai.com/v1" },
+      { key: "ai.model", label: "Model", placeholder: "gpt-4o-mini" },
+      { key: "ai.apiKey", label: "API key (stored server-side, never sent to the browser)" },
+      { key: "ai.assistantName", label: "Assistant name", placeholder: "Fubrio Assistant" },
+      { key: "ai.systemPrompt", label: "System prompt", type: "textarea" },
+    ],
+  },
+  {
     title: "SEO defaults",
     keys: [
       { key: "seo.defaultTitle", label: "Default title" },
@@ -118,7 +129,7 @@ export function SettingsAdmin() {
               <RotateCcw className="h-4 w-4 mr-1.5" />
               Reload
             </Button>
-            <Button onClick={save} disabled={saving} className="rounded-full bg-foreground text-background hover:bg-foreground/90">
+            <Button onClick={save} disabled={saving}>
               {saving ? <Loader2 className="h-4 w-4 animate-spin mr-2" /> : <Save className="h-4 w-4 mr-2" />}
               Save changes
             </Button>
@@ -150,8 +161,8 @@ export function SettingsAdmin() {
                       />
                     ) : k.type === "color" ? (
                       <div className="flex gap-2">
-                        <Input type="color" value={values[k.key] ?? "#A0F2A0"} onChange={(e) => setValues({ ...values, [k.key]: e.target.value })} className="w-16 h-9" />
-                        <Input value={values[k.key] ?? ""} onChange={(e) => setValues({ ...values, [k.key]: e.target.value })} placeholder="#A0F2A0" />
+                        <Input type="color" value={values[k.key] ?? "#B0502C"} onChange={(e) => setValues({ ...values, [k.key]: e.target.value })} className="h-9 w-16" />
+                        <Input value={values[k.key] ?? ""} onChange={(e) => setValues({ ...values, [k.key]: e.target.value })} placeholder="#B0502C" />
                       </div>
                     ) : (
                       <Input

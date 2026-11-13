@@ -73,7 +73,7 @@ export function AdminOverview({ onNavigate }: Props) {
       <SectionHeader
         title="Dashboard overview"
         desc="Real-time stats and recent activity across the Fubrio platform."
-        action={<Button onClick={() => navigate("#home")} variant="outline" className="rounded-full">View public site</Button>}
+        action={<Button onClick={() => navigate("#home")} variant="outline" className="rounded-none">View public site</Button>}
       />
 
       {stats && (stats.newInquiries > 0 || stats.draftProjects > 0 || stats.draftPosts > 0) && (
@@ -108,7 +108,7 @@ export function AdminOverview({ onNavigate }: Props) {
 
       <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3">
         {loading || !stats ? (
-          Array.from({ length: 12 }).map((_, i) => <Skeleton key={i} className="h-24 rounded-xl" />)
+          Array.from({ length: 12 }).map((_, i) => <Skeleton key={i} className="h-24 rounded-sm" />)
         ) : (
           STAT_CARDS.map((s) => (
             <button
@@ -143,7 +143,7 @@ export function AdminOverview({ onNavigate }: Props) {
           </CardHeader>
           <CardContent className="space-y-2">
             {loading || !activity ? (
-              Array.from({ length: 3 }).map((_, i) => <Skeleton key={i} className="h-16 rounded-lg" />)
+              Array.from({ length: 3 }).map((_, i) => <Skeleton key={i} className="h-16 rounded-sm" />)
             ) : activity.recentInquiries.length === 0 ? (
               <div className="text-center text-sm text-muted-foreground py-8">No inquiries yet.</div>
             ) : (
@@ -151,9 +151,9 @@ export function AdminOverview({ onNavigate }: Props) {
                 <button
                   key={i.id}
                   onClick={() => onNavigate("inquiries")}
-                  className="w-full flex items-center gap-3 p-3 rounded-lg hover:bg-accent transition-colors text-left"
+                  className="w-full flex items-center gap-3 p-3 rounded-sm hover:bg-accent transition-colors text-left"
                 >
-                  <div className="flex h-9 w-9 items-center justify-center rounded-full bg-[var(--fubrio-accent-soft)] border border-[var(--fubrio-accent)]/30">
+                  <div className="flex h-9 w-9 items-center justify-center rounded-none bg-[var(--fubrio-accent-soft)] border border-[var(--fubrio-accent)]/30">
                     <Inbox className="h-4 w-4 text-[var(--fubrio-accent)]" />
                   </div>
                   <div className="min-w-0 flex-1">
@@ -185,7 +185,7 @@ export function AdminOverview({ onNavigate }: Props) {
             ) : (
               activity.logs.slice(0, 6).map((log) => (
                 <div key={log.id} className="flex items-center gap-3 p-2 text-sm">
-                  <div className="flex h-7 w-7 items-center justify-center rounded-full bg-secondary border border-border">
+                  <div className="flex h-7 w-7 items-center justify-center rounded-none bg-secondary border border-border">
                     <Clock className="h-3 w-3 text-muted-foreground" />
                   </div>
                   <div className="min-w-0 flex-1">
@@ -212,13 +212,13 @@ function AlertCard({ icon, label, value, onClick, tone }: { icon: React.ReactNod
   return (
     <button
       onClick={onClick}
-      className={`flex items-center gap-3 rounded-xl border p-4 text-left transition-all hover:-translate-y-0.5 ${
+      className={`flex items-center gap-3 rounded-sm border p-4 text-left transition-all ${
         tone === "accent"
           ? "border-[var(--fubrio-accent)]/40 bg-[var(--fubrio-accent-soft)]"
           : "border-border bg-card"
       }`}
     >
-      <div className={`flex h-9 w-9 items-center justify-center rounded-lg ${
+      <div className={`flex h-9 w-9 items-center justify-center rounded-sm ${
         tone === "accent" ? "bg-[var(--fubrio-accent)] text-[var(--fubrio-accent-foreground)]" : "bg-secondary"
       }`}>
         {icon}

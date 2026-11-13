@@ -1,9 +1,8 @@
 "use client";
 
-import { ArrowUpRight, Handshake } from "lucide-react";
-import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
+import { ArrowUpRight } from "lucide-react";
 import { navigate } from "@/lib/router";
+import { ChapterHead, Meta } from "@/components/site/editorial";
 import type { SerializedPartner } from "@/lib/types";
 
 const TYPE_LABEL: Record<string, string> = {
@@ -17,52 +16,49 @@ const TYPE_LABEL: Record<string, string> = {
 
 export function PartnersGrid({ partners }: { partners: SerializedPartner[] }) {
   if (partners.length === 0) return null;
-  return (
-    <section className="py-24 sm:py-32 border-t border-border/60" id="partners">
-      <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 items-end">
-          <div className="lg:col-span-8">
-            <div className="text-xs uppercase tracking-wider text-[var(--fubrio-accent)] font-semibold flex items-center gap-2">
-              <Handshake className="h-3.5 w-3.5" />
-              Partners
-            </div>
-            <h2 className="display-heading mt-3 text-4xl sm:text-5xl">
-              Stronger together.
-            </h2>
-            <p className="mt-4 text-muted-foreground text-base sm:text-lg max-w-2xl">
-              We collaborate with technology, community, development, media, brand, and strategic partners.
-            </p>
-          </div>
-          <div className="lg:col-span-4 lg:text-right">
-            <Button variant="outline" onClick={() => navigate("#contact")} className="rounded-full">
-              Become a partner
-              <ArrowUpRight className="ml-1.5 h-4 w-4" />
-            </Button>
-          </div>
-        </div>
 
-        <div className="mt-12 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
+  return (
+    <section className="py-16 sm:py-20" id="partners">
+      <div className="mx-auto max-w-[84rem] px-4 sm:px-6 lg:px-8">
+        <ChapterHead
+          index="05"
+          label="Partners"
+          title="People we build with."
+          description="Studios, communities and platforms we work alongside. Most of these started as a conversation in a Discord server."
+          action={
+            <button onClick={() => navigate("#contact")} className="link-arrow text-foreground">
+              Become a partner <ArrowUpRight className="h-3.5 w-3.5" />
+            </button>
+          }
+        />
+
+        <div className="mt-8 grid border-l border-t border-border sm:grid-cols-2 lg:grid-cols-3">
           {partners.map((p) => (
             <a
               key={p.id}
               href={p.website ?? "#"}
               target="_blank"
               rel="noopener noreferrer"
-              className="group relative rounded-2xl glass-card p-6 transition-all hover:-translate-y-0.5"
+              className="group flex min-h-[9.5rem] flex-col justify-between border-b border-r border-border p-5 transition-colors hover:bg-foreground/[0.03]"
             >
-              <div className="flex items-start justify-between">
-                <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-gradient-to-br from-secondary to-muted font-display text-lg font-semibold">
-                  {p.name.split(" ").slice(0, 2).map((w) => w[0]).join("")}
-                </div>
-                {p.featured && (
-                  <Badge variant="secondary" className="text-xs">Featured</Badge>
-                )}
+              <div className="flex items-start justify-between gap-3">
+                <h3 className="font-display text-[1.35rem] leading-tight">{p.name}</h3>
+                <span className="flex h-7 w-7 shrink-0 items-center justify-center border border-border font-mono text-[10px] uppercase text-muted-foreground">
+                  {p.name.slice(0, 2)}
+                </span>
               </div>
-              <h3 className="mt-4 font-display text-lg font-semibold">{p.name}</h3>
-              <p className="mt-1 text-sm text-muted-foreground line-clamp-2">{p.description}</p>
-              <div className="mt-4 flex items-center justify-between">
-                <Badge variant="outline" className="text-xs">{TYPE_LABEL[p.type] ?? p.type}</Badge>
-                <ArrowUpRight className="h-4 w-4 opacity-0 group-hover:opacity-100 transition-opacity" />
+
+              <div>
+                <p className="mt-2 line-clamp-2 text-sm leading-relaxed text-muted-foreground">
+                  {p.description}
+                </p>
+                <div className="mt-3 flex items-center justify-between">
+                  <Meta>
+                    {TYPE_LABEL[p.type] ?? p.type}
+                    {p.featured ? " · Featured" : ""}
+                  </Meta>
+                  <ArrowUpRight className="h-3.5 w-3.5 text-muted-foreground opacity-0 transition-opacity group-hover:opacity-100" />
+                </div>
               </div>
             </a>
           ))}

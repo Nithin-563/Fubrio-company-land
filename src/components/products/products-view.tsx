@@ -1,14 +1,22 @@
 "use client";
 
 import { useMemo, useState } from "react";
-import { ArrowLeft, Search, ExternalLink, BookOpen, ShoppingCart, Download, Package } from "lucide-react";
-import { Button } from "@/components/ui/button";
+import { ArrowLeft, Search, ArrowUpRight } from "lucide-react";
 import { Input } from "@/components/ui/input";
-import { Badge } from "@/components/ui/badge";
 import { navigate } from "@/lib/router";
 import { cn } from "@/lib/utils";
+import { Meta } from "@/components/site/editorial";
 import type { SerializedProduct, SerializedCategory } from "@/lib/types";
 import { usableImage } from "@/components/shared/gradient";
+
+const FIELD =
+  "h-9 w-full rounded-none border-0 border-b border-border bg-transparent px-0 text-sm shadow-none focus-visible:border-foreground focus-visible:ring-0 dark:bg-transparent";
+
+function priceOf(product: SerializedProduct) {
+  if (product.isFree) return "Free";
+  const symbol = product.currency === "INR" ? "₹" : product.currency === "USD" ? "$" : product.currency;
+  return `${symbol}${product.price}`;
+}
 
 export function ProductsView({ products, categories }: { products: SerializedProduct[]; categories: SerializedCategory[] }) {
   const [search, setSearch] = useState("");
@@ -28,49 +36,79 @@ export function ProductsView({ products, categories }: { products: SerializedPro
   const uncategorized = filtered.filter((p) => !p.category);
 
   return (
-    <div className="pt-4 pb-24 min-h-screen">
-      <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-        <button onClick={() => navigate("#home")} className="text-sm text-muted-foreground hover:text-foreground inline-flex items-center gap-1.5 mb-6">
-          <ArrowLeft className="h-3.5 w-3.5" /> Back to home
+    <div className="min-h-screen py-10">
+      <div className="mx-auto max-w-[84rem] px-4 sm:px-6 lg:px-8">
+        <button
+          onClick={() => navigate("#home")}
+          className="mb-8 inline-flex items-center gap-1.5 font-mono text-[11px] uppercase tracking-[0.1em] text-muted-foreground hover:text-foreground"
+        >
+          <ArrowLeft className="h-3.5 w-3.5" /> Home
         </button>
-        <div className="text-xs uppercase tracking-wider text-[var(--fubrio-accent)] font-semibold">Products</div>
-        <h1 className="display-heading mt-2 text-4xl sm:text-5xl">Digital marketplace</h1>
-        <p className="mt-2 text-muted-foreground">{filtered.length} product{filtered.length === 1 ? "" : "s"}.</p>
 
-        <div className="mt-8 relative max-w-md">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-          <Input value={search} onChange={(e) => setSearch(e.target.value)} placeholder="Search products…" className="pl-10 bg-background" />
+        <div className="chapter-head">
+          <div className="chapter-num">02</div>
+          <div className="flex min-w-0 flex-1 flex-col gap-5 md:flex-row md:items-end md:justify-between">
+            <div>
+              <div className="eyebrow">Products</div>
+              <h1 className="display-heading mt-2 text-[2.4rem] leading-[1.02] sm:text-[3.2rem]">
+                Things you can buy today
+              </h1>
+              <p className="mt-3 max-w-xl text-[0.9375rem] leading-relaxed text-muted-foreground">
+                Templates, tools and small software, priced plainly. {filtered.length} product
+                {filtered.length === 1 ? "" : "s"} listed.
+              </p>
+            </div>
+            <div className="relative w-full md:w-64">
+              <Search className="absolute left-0 top-1/2 h-3.5 w-3.5 -translate-y-1/2 text-muted-foreground" />
+              <Input
+                value={search}
+                onChange={(e) => setSearch(e.target.value)}
+                placeholder="Search products"
+                aria-label="Search products"
+                className={cn(FIELD, "pl-6")}
+              />
+            </div>
+          </div>
         </div>
 
         <div className="mt-10 space-y-12">
           {categorized.map(({ category, products: catProducts }) => (
-            <div key={category.id}>
-              <div className="flex items-center gap-3 mb-5">
-                {category.image && <img src={category.image} alt="" className="h-8 w-8 rounded-lg object-cover" />}
-                <h2 className="font-display text-2xl font-semibold">{category.name}</h2>
-                <Badge variant="outline" className="text-[10px]">{catProducts.length}</Badge>
+            <section key={category.id}>
+              <div className="flex items-baseline justify-between border-b border-border pb-1.5">
+                <span className="eyebrow">{category.name}</span>
+                <Meta>{catProducts.length}</Meta>
               </div>
-              {category.description && <p className="text-sm text-muted-foreground mb-5 -mt-3">{category.description}</p>}
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
-                {catProducts.map((product) => <ProductCard key={product.id} product={product} />)}
+              {category.description && (
+                <p className="mt-2 max-w-2xl text-[13px] leading-relaxed text-muted-foreground">
+                  {category.description}
+                </p>
+              )}
+              <div className="grid border-t border-border sm:grid-cols-2">
+                {catProducts.map((product) => <ProductRow key={product.id} product={product} />)}
               </div>
-            </div>
+            </section>
           ))}
 
           {uncategorized.length > 0 && (
-            <div>
-              {categorized.length > 0 && <h2 className="font-display text-2xl font-semibold mb-5">Other</h2>}
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
-                {uncategorized.map((product) => <ProductCard key={product.id} product={product} />)}
+            <section>
+              {categorized.length > 0 && (
+                <div className="flex items-baseline justify-between border-b border-border pb-1.5">
+                  <span className="eyebrow">Other</span>
+                  <Meta>{uncategorized.length}</Meta>
+                </div>
+              )}
+              <div className="grid border-t border-border sm:grid-cols-2">
+                {uncategorized.map((product) => <ProductRow key={product.id} product={product} />)}
               </div>
-            </div>
+            </section>
           )}
 
           {filtered.length === 0 && (
-            <div className="text-center py-20 border border-dashed border-border rounded-2xl">
-              <Package className="h-8 w-8 mx-auto mb-2 opacity-50" />
-              <div className="font-display text-lg font-semibold">No products found</div>
-              <div className="mt-1 text-sm text-muted-foreground">Try adjusting your search.</div>
+            <div className="py-24">
+              <div className="font-display text-[1.8rem]">No products match “{search}”.</div>
+              <p className="mt-2 text-sm text-muted-foreground">
+                Clear the search, or ask us whether we have something similar.
+              </p>
             </div>
           )}
         </div>
@@ -79,110 +117,117 @@ export function ProductsView({ products, categories }: { products: SerializedPro
   );
 }
 
-function ProductCard({ product }: { product: SerializedProduct }) {
+function ProductRow({ product }: { product: SerializedProduct }) {
   const img = usableImage(product.coverImage) || usableImage(product.thumbnail);
   return (
-    <div className="group rounded-2xl border border-border bg-card overflow-hidden transition-all hover:-translate-y-0.5 hover:border-[var(--fubrio-accent)]/40 glass-card">
-      <div className="aspect-[16/10] relative overflow-hidden">
+    <button
+      onClick={() => navigate(`#products/${product.slug}`)}
+      className="group flex items-start gap-4 border-b border-border px-0 py-4 text-left transition-colors hover:bg-foreground/[0.03] sm:px-4 sm:odd:border-r"
+    >
+      <span className="h-14 w-14 shrink-0 overflow-hidden border border-border bg-muted">
         {img ? (
-          <img src={img} alt={product.title} className="absolute inset-0 h-full w-full object-cover transition-transform duration-500 group-hover:scale-105" />
+          <img src={img} alt="" width={80} height={80} loading="lazy" decoding="async" className="h-full w-full object-cover" />
         ) : (
-          <div className="absolute inset-0 bg-gradient-to-br from-secondary to-muted flex items-center justify-center">
-            <Package className="h-8 w-8 text-muted-foreground" />
-          </div>
+          <span className="flex h-full w-full items-center justify-center font-display text-lg text-muted-foreground/40">
+            {product.title.slice(0, 2).toUpperCase()}
+          </span>
         )}
-        <div className="absolute top-3 right-3">
-          <div className="rounded-full bg-background/95 backdrop-blur px-3 py-1 text-xs font-semibold">
-            {product.isFree ? "Free" : `${product.currency === "INR" ? "₹" : "$"}${product.price}`}
-          </div>
-        </div>
-      </div>
-      <div className="p-4">
-        <h3 className="font-display font-semibold text-base group-hover:text-[var(--fubrio-accent)] transition-colors">{product.title}</h3>
-        <p className="mt-1 text-xs text-muted-foreground line-clamp-2">{product.shortDesc}</p>
-        <div className="mt-4 flex flex-wrap gap-2">
-          {product.demoUrl && (
-            <Button asChild size="sm" variant="outline" className="rounded-full">
-              <a href={product.demoUrl} target="_blank" rel="noopener noreferrer">
-                <ExternalLink className="h-3.5 w-3.5 mr-1" /> Demo
-              </a>
-            </Button>
-          )}
-          {!product.isFree && (product as any).purchaseUrl && (
-            <Button asChild size="sm" variant="outline" className="rounded-full">
-              <a href={(product as any).purchaseUrl} target="_blank" rel="noopener noreferrer">
-                <ShoppingCart className="h-3.5 w-3.5 mr-1" /> Purchase
-              </a>
-            </Button>
-          )}
-          {product.isFree && (product as any).downloadUrl && (
-            <Button asChild size="sm" variant="outline" className="rounded-full">
-              <a href={(product as any).downloadUrl} target="_blank" rel="noopener noreferrer">
-                <Download className="h-3.5 w-3.5 mr-1" /> Download
-              </a>
-            </Button>
-          )}
-          {product.documentation && (
-            <Button asChild size="sm" variant="ghost" className="rounded-full">
-              <a href={product.documentation} target="_blank" rel="noopener noreferrer">
-                <BookOpen className="h-3.5 w-3.5 mr-1" /> Docs
-              </a>
-            </Button>
-          )}
-        </div>
-      </div>
-    </div>
+      </span>
+
+      <span className="min-w-0 flex-1">
+        <span className="flex flex-wrap items-baseline justify-between gap-2">
+          <span className="font-display text-[1.2rem] leading-tight transition-colors group-hover:text-[var(--fubrio-accent)]">
+            {product.title}
+          </span>
+          <Meta>{priceOf(product)}</Meta>
+        </span>
+        <span className="mt-0.5 line-clamp-2 block text-[13px] leading-relaxed text-muted-foreground">
+          {product.shortDesc}
+        </span>
+        {product.technologies.length > 0 && (
+          <span className="mt-1.5 flex flex-wrap gap-x-3">
+            {product.technologies.slice(0, 3).map((t) => (
+              <Meta key={t} className="text-muted-foreground/70">{t}</Meta>
+            ))}
+          </span>
+        )}
+      </span>
+
+      <ArrowUpRight className="mt-1 h-4 w-4 shrink-0 text-muted-foreground transition-transform group-hover:-translate-y-0.5 group-hover:translate-x-0.5" />
+    </button>
   );
 }
 
 export function ProductDetail({ product }: { product: SerializedProduct }) {
   return (
-    <div className="pt-4 pb-24 min-h-screen">
+    <div className="min-h-screen py-10">
       <div className="mx-auto max-w-4xl px-4 sm:px-6 lg:px-8">
-        <button onClick={() => navigate("#products")} className="text-sm text-muted-foreground hover:text-foreground inline-flex items-center gap-1.5 mb-6">
-          <ArrowLeft className="h-3.5 w-3.5" /> Back to products
+        <button
+          onClick={() => navigate("#products")}
+          className="mb-8 inline-flex items-center gap-1.5 font-mono text-[11px] uppercase tracking-[0.1em] text-muted-foreground hover:text-foreground"
+        >
+          <ArrowLeft className="h-3.5 w-3.5" /> All products
         </button>
+
+        <div className="flex flex-wrap items-baseline justify-between gap-3 border-b border-border pb-3">
+          <div className="eyebrow">Product</div>
+          <Meta>{priceOf(product)}</Meta>
+        </div>
+
+        <h1 className="display-heading mt-4 text-[2.4rem] leading-[1.02] sm:text-[3rem]">{product.title}</h1>
+        <p className="mt-3 max-w-2xl text-[0.9375rem] leading-relaxed text-muted-foreground">{product.shortDesc}</p>
+
         {product.coverImage && (
-          <div className="aspect-[16/9] rounded-2xl overflow-hidden mb-6">
-            <img src={product.coverImage} alt={product.title} className="h-full w-full object-cover" />
+          <div className="mt-6 aspect-[16/9] overflow-hidden border border-border bg-muted">
+            <img src={product.coverImage} alt={product.title} width={1200} height={675} className="h-full w-full object-cover" />
           </div>
         )}
-        <h1 className="display-heading text-4xl">{product.title}</h1>
-        <p className="mt-2 text-muted-foreground">{product.shortDesc}</p>
-        <div className="mt-4 text-lg font-semibold">
-          {product.isFree ? "Free" : `${product.currency === "INR" ? "₹" : "$"}${product.price}`}
-        </div>
-        {product.fullDesc && <div className="mt-6 prose dark:prose-invert max-w-none" dangerouslySetInnerHTML={{ __html: product.fullDesc }} />}
+
+        {product.fullDesc && (
+          <div
+            className="prose prose-neutral mt-8 max-w-none dark:prose-invert prose-headings:font-display prose-headings:font-normal prose-p:leading-relaxed"
+            dangerouslySetInnerHTML={{ __html: product.fullDesc }}
+          />
+        )}
+
         {product.features && product.features.length > 0 && (
-          <div className="mt-6">
-            <h2 className="font-display text-xl font-semibold mb-3">Features</h2>
-            <ul className="space-y-2">
-              {product.features.map((f, i) => <li key={i} className="flex items-start gap-2 text-sm"><span className="text-[var(--fubrio-accent)]">✓</span> {f}</li>)}
+          <div className="mt-8">
+            <div className="eyebrow border-b border-border pb-1.5">What is included</div>
+            <ul className="ruled-list mt-0 border-t-0">
+              {product.features.map((f, i) => (
+                <li key={i} className="flex items-start gap-3 py-2 text-[0.9375rem]">
+                  <Meta className="pt-1">{String(i + 1).padStart(2, "0")}</Meta>
+                  <span>{f}</span>
+                </li>
+              ))}
             </ul>
           </div>
         )}
-        <div className="mt-8 flex flex-wrap gap-3">
+
+        <div className="mt-8 flex flex-wrap items-center gap-3">
           {product.demoUrl && (
-            <Button asChild className="rounded-full bg-foreground text-background hover:bg-foreground/90">
-              <a href={product.demoUrl} target="_blank" rel="noopener noreferrer">
-                <ExternalLink className="h-4 w-4 mr-2" /> Try demo
-              </a>
-            </Button>
+            <a href={product.demoUrl} target="_blank" rel="noopener noreferrer" className="btn-ink">
+              Try the demo <ArrowUpRight className="h-4 w-4" />
+            </a>
           )}
           {!product.isFree && (product as any).purchaseUrl && (
-            <Button asChild className="rounded-full">
-              <a href={(product as any).purchaseUrl} target="_blank" rel="noopener noreferrer">
-                <ShoppingCart className="h-4 w-4 mr-2" /> Purchase
-              </a>
-            </Button>
+            <a href={(product as any).purchaseUrl} target="_blank" rel="noopener noreferrer" className="btn-ink">
+              Buy now <ArrowUpRight className="h-4 w-4" />
+            </a>
           )}
           {product.isFree && (product as any).downloadUrl && (
-            <Button asChild className="rounded-full">
-              <a href={(product as any).downloadUrl} target="_blank" rel="noopener noreferrer">
-                <Download className="h-4 w-4 mr-2" /> Download
-              </a>
-            </Button>
+            <a href={(product as any).downloadUrl} target="_blank" rel="noopener noreferrer" className="btn-ink">
+              Download
+            </a>
           )}
+          {product.documentation && (
+            <a href={product.documentation} target="_blank" rel="noopener noreferrer" className="btn-line">
+              Documentation
+            </a>
+          )}
+          <button onClick={() => navigate("#contact")} className="link-arrow text-muted-foreground">
+            Ask a question
+          </button>
         </div>
       </div>
     </div>

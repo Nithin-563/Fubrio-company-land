@@ -341,7 +341,7 @@ export function BloomCommandsShowcase() {
             variant={activeCategory === "all" ? "default" : "outline"}
             size="sm"
             onClick={() => setActiveCategory("all")}
-            className="rounded-full"
+            className="rounded-none"
           >
             All ({totalCommands})
           </Button>
@@ -351,9 +351,9 @@ export function BloomCommandsShowcase() {
               variant={activeCategory === c.id ? "default" : "outline"}
               size="sm"
               onClick={() => setActiveCategory(c.id)}
-              className="rounded-full"
+              className="rounded-none"
             >
-              {c.icon} {c.label}
+              {c.label}
             </Button>
           ))}
         </div>
@@ -361,20 +361,21 @@ export function BloomCommandsShowcase() {
 
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
         {filtered.map((cat) => (
-          <div key={cat.id} className="rounded-2xl border border-border bg-card overflow-hidden glass-card">
-            <div className="p-5 border-b border-border">
-              <div className="flex items-center gap-3 mb-1">
-                <span className="text-2xl">{cat.icon}</span>
-                <h3 className="font-display text-lg font-semibold">{cat.label}</h3>
-                <Badge variant="outline" className="text-[10px] ml-auto">{cat.commands.length}</Badge>
+          <div key={cat.id} className="border border-border bg-card">
+            <div className="border-b border-border px-4 py-3">
+              <div className="flex items-baseline justify-between gap-3">
+                <h3 className="text-[0.9375rem]">{cat.label}</h3>
+                <span className="font-mono text-[10px] tracking-[0.14em] text-muted-foreground">
+                  {cat.commands.length}
+                </span>
               </div>
-              <p className="text-xs text-muted-foreground">{cat.description}</p>
+              <p className="mt-0.5 text-[12px] text-muted-foreground">{cat.description}</p>
             </div>
-            <div className="p-3 space-y-1 max-h-48 overflow-y-auto">
+            <div className="max-h-48 space-y-px overflow-y-auto px-2 py-2">
               {cat.commands.map((cmd) => (
-                <div key={cmd.name} className="flex items-start gap-2 p-2 rounded-lg hover:bg-accent/30 transition-colors">
-                  <code className="text-xs font-mono text-[var(--fubrio-accent)] flex-shrink-0">/{cmd.name}</code>
-                  <span className="text-xs text-muted-foreground">{cmd.description}</span>
+                <div key={cmd.name} className="flex items-baseline gap-2 py-1">
+                  <code className="flex-shrink-0 font-mono text-[11px] text-[var(--fubrio-accent)]">/{cmd.name}</code>
+                  <span className="text-[12px] leading-relaxed text-muted-foreground">{cmd.description}</span>
                 </div>
               ))}
             </div>

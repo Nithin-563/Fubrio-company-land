@@ -1,61 +1,67 @@
 import { headers } from "next/headers";
 
+type Entry = { loc: string; changefreq: string; priority: string; lastmod?: string };
+
+const FUBRIO_ENTRIES: Entry[] = [
+  { loc: "/", changefreq: "weekly", priority: "1.0" },
+  { loc: "/#showcase", changefreq: "weekly", priority: "0.9" },
+  { loc: "/#services", changefreq: "monthly", priority: "0.9" },
+  { loc: "/#capabilities", changefreq: "monthly", priority: "0.8" },
+  { loc: "/#products", changefreq: "weekly", priority: "0.8" },
+  { loc: "/#partners", changefreq: "monthly", priority: "0.7" },
+  { loc: "/#community", changefreq: "weekly", priority: "0.7" },
+  { loc: "/#blog", changefreq: "weekly", priority: "0.7" },
+  { loc: "/#shop", changefreq: "weekly", priority: "0.7" },
+  { loc: "/#donators", changefreq: "monthly", priority: "0.6" },
+  { loc: "/#docs", changefreq: "monthly", priority: "0.6" },
+  { loc: "/#announcements", changefreq: "daily", priority: "0.6" },
+  { loc: "/#subscriptions", changefreq: "monthly", priority: "0.6" },
+  { loc: "/#faq", changefreq: "monthly", priority: "0.5" },
+  { loc: "/#api-keys", changefreq: "monthly", priority: "0.5" },
+  { loc: "/#contact", changefreq: "monthly", priority: "0.5" },
+  { loc: "/#about", changefreq: "monthly", priority: "0.4" },
+  { loc: "/#team", changefreq: "monthly", priority: "0.4" },
+  { loc: "/#sponsors", changefreq: "monthly", priority: "0.4" },
+];
+
+const BLOOM_ENTRIES: Entry[] = [
+  { loc: "/", changefreq: "weekly", priority: "1.0" },
+  { loc: "/#commands", changefreq: "weekly", priority: "0.9" },
+  { loc: "/#docs", changefreq: "monthly", priority: "0.8" },
+  { loc: "/#blog", changefreq: "weekly", priority: "0.7" },
+  { loc: "/#announcements", changefreq: "daily", priority: "0.7" },
+  { loc: "/#shop", changefreq: "weekly", priority: "0.6" },
+  { loc: "/#faq", changefreq: "monthly", priority: "0.6" },
+  { loc: "/#api-keys", changefreq: "monthly", priority: "0.5" },
+  { loc: "/#contact", changefreq: "monthly", priority: "0.5" },
+];
 
 export async function GET() {
   const headersList = await headers();
-  const host = headersList.get("host") || headersList.get("x-forwarded-host") || "";
-  const isBloom = host.toLowerCase().startsWith("bloom.");
-
-  const today = new Date().toISOString().slice(0, 10);
-
-  let urls: Array<{ loc: string; lastmod?: string; changefreq?: string; priority?: string }> = [];
-
-  if (isBloom) {
-    urls = [
-      { loc: "https://bloom.fubrio.in/", lastmod: today, changefreq: "weekly", priority: "1.0" },
-      { loc: "https://bloom.fubrio.in/#commands", lastmod: today, changefreq: "weekly", priority: "0.9" },
-      { loc: "https://bloom.fubrio.in/#docs", lastmod: today, changefreq: "monthly", priority: "0.8" },
-      { loc: "https://bloom.fubrio.in/#subscriptions", lastmod: today, changefreq: "monthly", priority: "0.8" },
-      { loc: "https://bloom.fubrio.in/#announcements", lastmod: today, changefreq: "daily", priority: "0.7" },
-      { loc: "https://bloom.fubrio.in/#blog", lastmod: today, changefreq: "weekly", priority: "0.7" },
-      { loc: "https://bloom.fubrio.in/#shop", lastmod: today, changefreq: "weekly", priority: "0.6" },
-      { loc: "https://bloom.fubrio.in/#faq", lastmod: today, changefreq: "monthly", priority: "0.6" },
-      { loc: "https://bloom.fubrio.in/#api-keys", lastmod: today, changefreq: "monthly", priority: "0.5" },
-      { loc: "https://bloom.fubrio.in/#contact", lastmod: today, changefreq: "monthly", priority: "0.5" },
-    ];
-  } else {
-    urls = [
-      { loc: "https://fubrio.in/", lastmod: today, changefreq: "weekly", priority: "1.0" },
-      { loc: "https://fubrio.in/#showcase", lastmod: today, changefreq: "weekly", priority: "0.9" },
-      { loc: "https://fubrio.in/#products", lastmod: today, changefreq: "weekly", priority: "0.8" },
-      { loc: "https://fubrio.in/#services", lastmod: today, changefreq: "monthly", priority: "0.8" },
-      { loc: "https://fubrio.in/#blog", lastmod: today, changefreq: "weekly", priority: "0.7" },
-      { loc: "https://fubrio.in/#shop", lastmod: today, changefreq: "weekly", priority: "0.7" },
-      { loc: "https://fubrio.in/#docs", lastmod: today, changefreq: "monthly", priority: "0.7" },
-      { loc: "https://fubrio.in/#announcements", lastmod: today, changefreq: "daily", priority: "0.6" },
-      { loc: "https://fubrio.in/#subscriptions", lastmod: today, changefreq: "monthly", priority: "0.6" },
-      { loc: "https://fubrio.in/#api-keys", lastmod: today, changefreq: "monthly", priority: "0.5" },
-      { loc: "https://fubrio.in/#faq", lastmod: today, changefreq: "monthly", priority: "0.5" },
-      { loc: "https://fubrio.in/#contact", lastmod: today, changefreq: "monthly", priority: "0.5" },
-      { loc: "https://fubrio.in/#about", lastmod: today, changefreq: "monthly", priority: "0.4" },
-      { loc: "https://fubrio.in/#sponsors", lastmod: today, changefreq: "monthly", priority: "0.4" },
-    ];
-  }
+  const host = (headersList.get("host") || headersList.get("x-forwarded-host") || "").toLowerCase();
+  const isBloom = host.startsWith("bloom.");
+  const origin = isBloom ? "https://bloom.fubrio.in" : "https://fubrio.in";
+  const lastmod = new Date().toISOString().slice(0, 10);
+  const entries = isBloom ? BLOOM_ENTRIES : FUBRIO_ENTRIES;
 
   const xml = `<?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
-${urls.map(u => `  <url>
-    <loc>${u.loc}</loc>
-    ${u.lastmod ? `<lastmod>${u.lastmod}</lastmod>` : ""}
-    ${u.changefreq ? `<changefreq>${u.changefreq}</changefreq>` : ""}
-    ${u.priority ? `<priority>${u.priority}</priority>` : ""}
-  </url>`).join("\n")}
+${entries
+  .map(
+    (e) => `  <url>
+    <loc>${origin}${e.loc}</loc>
+    <lastmod>${lastmod}</lastmod>
+    <changefreq>${e.changefreq}</changefreq>
+    <priority>${e.priority}</priority>
+  </url>`,
+  )
+  .join("\n")}
 </urlset>`;
 
   return new Response(xml, {
     headers: {
-      "Content-Type": "application/xml",
-      "Cache-Control": "public, max-age=3600",
+      "Content-Type": "application/xml; charset=utf-8",
+      "Cache-Control": "public, max-age=3600, stale-while-revalidate=86400",
     },
   });
 }

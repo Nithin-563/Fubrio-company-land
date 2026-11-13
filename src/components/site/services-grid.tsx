@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import { useEffect, useState } from "react";
 import { Badge } from "@/components/ui/badge";
 import { navigate } from "@/lib/router";
+import { ChapterHead } from "@/components/site/editorial";
 import type { SerializedService, SerializedCategory } from "@/lib/types";
 
 const ICONS: Record<string, React.ComponentType<{ className?: string }>> = {
@@ -1066,595 +1067,438 @@ function UsdPrice({ price, rate }: { price: string; rate: number }) {
 }
 
 
+type ServiceGroup = {
+  id: string;
+  label: string;
+  heading: string;
+  description: string;
+  services: AppService[];
+};
+
+const SERVICE_GROUPS: ServiceGroup[] = [
+  {
+    id: "hosting",
+    label: "Hosting",
+    heading: "Server space, without the sales call.",
+    description:
+      "Game servers, bots, websites, databases and storage. Pick a size, we set it up and hand over the keys.",
+    services: HOSTING_SERVICES as unknown as AppService[],
+  },
+  {
+    id: "apps",
+    label: "Mobile apps",
+    heading: "Apps built around the idea, not a template.",
+    description: "Android, iOS and cross-platform builds, from a first screen to a store listing.",
+    services: APP_DEVELOPMENT_SERVICES,
+  },
+  {
+    id: "websites",
+    label: "Websites",
+    heading: "Sites that load quickly and say something.",
+    description:
+      "Landing pages, business sites, stores, portals and dashboards. Fast by default, editable afterwards.",
+    services: WEB_DEVELOPMENT_SERVICES,
+  },
+  {
+    id: "software",
+    label: "Software",
+    heading: "Tools for the way your team already works.",
+    description: "Desktop software, business systems, APIs, databases and integrations.",
+    services: SOFTWARE_DEVELOPMENT_SERVICES,
+  },
+  {
+    id: "ai",
+    label: "AI & automation",
+    heading: "AI where it earns its keep.",
+    description:
+      "Chatbots, assistants, agents, search over your own documents, and automation that removes a repetitive step.",
+    services: AI_AUTOMATION_SERVICES,
+  },
+  {
+    id: "games",
+    label: "Games",
+    heading: "Small games, made properly.",
+    description: "Prototypes, 2D and 3D projects, multiplayer systems, assets and post-launch work.",
+    services: GAME_DEVELOPMENT_SERVICES,
+  },
+  {
+    id: "minecraft",
+    label: "Minecraft",
+    heading: "Servers that hold up on a Friday night.",
+    description: "Setup, plugins, mods, builds, SMP systems, minigames and optimisation.",
+    services: MINECRAFT_SERVICES,
+  },
+  {
+    id: "video",
+    label: "Video",
+    heading: "Edits that keep people watching.",
+    description: "Long-form edits, shorts, gaming videos, motion graphics and launch trailers.",
+    services: VIDEO_MOTION_SERVICES,
+  },
+  {
+    id: "business",
+    label: "Business",
+    heading: "Systems that replace the spreadsheet.",
+    description: "CRM, inventory, billing, bookings, reporting and the integrations between them.",
+    services: BUSINESS_SOLUTIONS_SERVICES,
+  },
+  {
+    id: "marketing",
+    label: "Marketing",
+    heading: "Distribution, handled.",
+    description: "Social, ads, SEO, content and campaigns — measured, not guessed.",
+    services: MARKETING_SERVICES,
+  },
+  {
+    id: "creators",
+    label: "Creators",
+    heading: "Support for people who publish.",
+    description: "Channel branding, editing, thumbnails, streaming setup and portfolio sites.",
+    services: CREATOR_SERVICES,
+  },
+  {
+    id: "design",
+    label: "Design",
+    heading: "An identity you can actually apply.",
+    description: "Logos, brand systems, social kits, interfaces and presentation decks.",
+    services: DESIGN_BRANDING_SERVICES,
+  },
+  {
+    id: "discord",
+    label: "Discord",
+    heading: "Servers people stay in.",
+    description: "Structure, bots, moderation, tickets, roles and custom bot development.",
+    services: DISCORD_SERVICES,
+  },
+  {
+    id: "community",
+    label: "Community",
+    heading: "Community work, minus the growth hacking.",
+    description: "Setup, engagement, events, portals, moderation and long-term upkeep.",
+    services: COMMUNITY_SERVICES,
+  },
+  {
+    id: "security",
+    label: "Security",
+    heading: "Testing, only with written permission.",
+    description:
+      "Reviews and hardening for systems you own or are explicitly authorised to test.",
+    services: FUBZ_SECURITY_SERVICES,
+  },
+  {
+    id: "maintenance",
+    label: "Maintenance",
+    heading: "Someone to call when it breaks.",
+    description: "Fixes, updates, migrations and monthly support for projects already in the wild.",
+    services: MAINTENANCE_SERVICES,
+  },
+  {
+    id: "consulting",
+    label: "Consulting",
+    heading: "A second opinion before you commit.",
+    description: "Technical direction, architecture reviews and planning sessions.",
+    services: CONSULTING_SERVICES,
+  },
+];
+
 export function ServicesGrid({ services, categories }: { services: SerializedService[]; categories?: SerializedCategory[] }) {
-  const [selectedHosting, setSelectedHosting] = useState<HostingService | null>(null);
-  const [selectedAppService, setSelectedAppService] = useState<AppService | null>(null);
-  const [hostingOpen, setHostingOpen] = useState(false);
-  const [appDevelopmentOpen, setAppDevelopmentOpen] = useState(false);
-  const [selectedWebService, setSelectedWebService] = useState<WebDevelopmentService | null>(null);
-  const [webDevelopmentOpen, setWebDevelopmentOpen] = useState(false);
-  const [selectedSoftwareService, setSelectedSoftwareService] = useState<AppService | null>(null);
-  const [softwareDevelopmentOpen, setSoftwareDevelopmentOpen] = useState(false);
-  const [selectedAiService, setSelectedAiService] = useState<AppService | null>(null);
-  const [aiAutomationOpen, setAiAutomationOpen] = useState(false);
-  const [gameDevelopmentOpen, setGameDevelopmentOpen] = useState(false);
-  const [minecraftOpen, setMinecraftOpen] = useState(false);
-  const [selectedGameService, setSelectedGameService] = useState<AppService | null>(null);
-  const [selectedMinecraftService, setSelectedMinecraftService] = useState<AppService | null>(null);
-  const [designBrandingOpen, setDesignBrandingOpen] = useState(false);
-  const [discordOpen, setDiscordOpen] = useState(false);
-  const [selectedDesignService, setSelectedDesignService] = useState<AppService | null>(null);
-  const [selectedDiscordService, setSelectedDiscordService] = useState<AppService | null>(null);
-  const [videoMotionOpen, setVideoMotionOpen] = useState(false);
-  const [businessSolutionsOpen, setBusinessSolutionsOpen] = useState(false);
-  const [selectedVideoMotionService, setSelectedVideoMotionService] = useState<AppService | null>(null);
-  const [selectedBusinessSolutionsService, setSelectedBusinessSolutionsService] = useState<AppService | null>(null);
-  const [marketingOpen, setMarketingOpen] = useState(false);
-  const [creatorServicesOpen, setCreatorServicesOpen] = useState(false);
-  const [selectedMarketingService, setSelectedMarketingService] = useState<AppService | null>(null);
-  const [selectedCreatorService, setSelectedCreatorService] = useState<AppService | null>(null);
-  const [fubzSecurityOpen, setFubzSecurityOpen] = useState(false);
-  const [communityServicesOpen, setCommunityServicesOpen] = useState(false);
-  const [selectedFubzSecurityService, setSelectedFubzSecurityService] = useState<AppService | null>(null);
-  const [selectedCommunityService, setSelectedCommunityService] = useState<AppService | null>(null);
-  const [maintenanceOpen, setMaintenanceOpen] = useState(false);
-  const [consultingOpen, setConsultingOpen] = useState(false);
-  const [selectedMaintenanceService, setSelectedMaintenanceService] = useState<AppService | null>(null);
-  const [selectedConsultingService, setSelectedConsultingService] = useState<AppService | null>(null);
+  const [activeId, setActiveId] = useState<string>(SERVICE_GROUPS[0].id);
+  const [selected, setSelected] = useState<AppService | null>(null);
   const [usdRate, setUsdRate] = useState(1 / 83);
 
   useEffect(() => {
-    let active = true;
-    fetch("https://open.er-api.com/v6/latest/INR", { cache: "no-store" })
-      .then((response) => response.ok ? response.json() : null)
+    let alive = true;
+    fetch("https://open.er-api.com/v6/latest/INR")
+      .then((r) => (r.ok ? r.json() : null))
       .then((data) => {
         const rate = Number(data?.rates?.USD);
-        if (active && Number.isFinite(rate) && rate > 0) setUsdRate(rate);
+        if (alive && Number.isFinite(rate) && rate > 0) setUsdRate(rate);
       })
       .catch(() => undefined);
-    return () => { active = false; };
+    return () => {
+      alive = false;
+    };
   }, []);
-  const serviceCategories = (categories ?? []).filter((c: any) => c.type === "service" || c.type === "Service");
-  const categorized = serviceCategories.map((cat) => ({
-    category: cat,
-    services: services.filter((s: any) => s.category?.id === cat.id),
-  })).filter((g) => g.services.length > 0);
+
+  const active = SERVICE_GROUPS.find((g) => g.id === activeId) ?? SERVICE_GROUPS[0];
+
+  const serviceCategories = (categories ?? []).filter(
+    (c: any) => c.type === "service" || c.type === "Service",
+  );
+  const categorized = serviceCategories
+    .map((cat) => ({
+      category: cat,
+      services: services.filter((s: any) => s.category?.id === cat.id),
+    }))
+    .filter((g) => g.services.length > 0);
   const uncategorized = services.filter((s: any) => !s.category);
+  const hasStudioServices = categorized.length > 0 || uncategorized.length > 0;
+
+  const explore = () => document.getElementById("services")?.scrollIntoView({ behavior: "smooth", block: "start" });
 
   return (
-    <section className="py-24 sm:py-32 bg-secondary/30 border-y border-border/60" id="services">
-      <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 items-end">
-          <div className="lg:col-span-7">
-            <div className="text-xs uppercase tracking-wider text-[var(--fubrio-accent)] font-semibold">Services</div>
-            <h2 className="display-heading mt-3 text-4xl sm:text-5xl">
-              Custom development for ambitious teams.
-            </h2>
-            <p className="mt-4 text-muted-foreground text-base sm:text-lg max-w-2xl">
-              Websites, apps, software, hosting, automation, and practical support for people building something of their own.
+    <section className="py-16 sm:py-20" id="services">
+      <div className="mx-auto max-w-[84rem] px-4 sm:px-6 lg:px-8">
+        <ChapterHead
+          index="02"
+          label="Services"
+          title="Work you can commission, priced in the open."
+          description="Seventeen disciplines, one rate card. Pick a category to see what it includes and where it starts."
+          action={
+            <button onClick={() => navigate("#contact")} className="link-arrow text-foreground">
+              Start a project <ArrowUpRight className="h-3.5 w-3.5" />
+            </button>
+          }
+        />
+
+        <div className="mt-8 tab-strip" role="tablist" aria-label="Service categories">
+          {SERVICE_GROUPS.map((group) => (
+            <button
+              key={group.id}
+              role="tab"
+              aria-selected={group.id === activeId}
+              data-active={group.id === activeId}
+              onClick={() => setActiveId(group.id)}
+              className="tab-item"
+            >
+              {group.label}
+              <span className="tab-count">{group.services.length}</span>
+            </button>
+          ))}
+        </div>
+
+        <div className="grid gap-8 pt-7 lg:grid-cols-12 lg:gap-12">
+          <div className="lg:col-span-4">
+            <h3 className="font-display text-[1.9rem] leading-[1.08]">{active.heading}</h3>
+            <p className="mt-3 max-w-sm text-[0.9375rem] leading-relaxed text-muted-foreground">
+              {active.description}
+            </p>
+            <div className="mt-6 flex flex-col items-start gap-3">
+              <button onClick={() => navigate("#contact")} className="btn-ink">
+                Enquire about {active.label}
+              </button>
+              <button
+                onClick={explore}
+                className="border-b border-border pb-0.5 text-sm text-muted-foreground transition-colors hover:border-foreground hover:text-foreground"
+              >
+                See the full rate card below
+              </button>
+            </div>
+          </div>
+
+          <div className="lg:col-span-8">
+            <ul className="ruled-list border-t border-border">
+              {active.services.map((service, i) => {
+                const Icon = service.icon;
+                return (
+                  <li key={`${active.id}-${service.title}`}>
+                    <button
+                      onClick={() => setSelected(service)}
+                      className="group grid w-full grid-cols-[1.75rem_1fr_auto] items-center gap-3 py-3.5 text-left sm:grid-cols-[1.75rem_1fr_9rem_auto] sm:gap-4"
+                    >
+                      <span className="font-mono text-[11px] text-muted-foreground">
+                        {String(i + 1).padStart(2, "0")}
+                      </span>
+
+                      <span className="min-w-0">
+                        <span className="flex items-center gap-2">
+                          <Icon className="h-3.5 w-3.5 shrink-0 text-muted-foreground" aria-hidden />
+                          <span className="text-[0.9375rem] font-medium transition-colors group-hover:text-[var(--fubrio-accent)]">
+                            {service.title}
+                          </span>
+                        </span>
+                        <span className="mt-0.5 line-clamp-2 block text-[13px] leading-relaxed text-muted-foreground">
+                          {service.summary}
+                        </span>
+                      </span>
+
+                      <span className="hidden text-right sm:block">
+                        <span className="block font-mono text-[11px] text-foreground">
+                          {enforceMinimumInr(service.from)}
+                        </span>
+                        <UsdPrice price={service.from} rate={usdRate} />
+                      </span>
+
+                      <ArrowUpRight className="h-4 w-4 shrink-0 text-muted-foreground transition-transform group-hover:-translate-y-0.5 group-hover:translate-x-0.5" />
+                    </button>
+                  </li>
+                );
+              })}
+            </ul>
+
+            <p className="mt-4 font-mono text-[11px] leading-relaxed text-muted-foreground">
+              Prices are starting points in INR. Scope, timeline and payment schedule are agreed in
+              writing before any work begins.
             </p>
           </div>
-          <div className="lg:col-span-5 lg:text-right">
-            <Button variant="outline" onClick={() => navigate("#contact")} className="rounded-full">
-              Start a project
-              <ArrowUpRight className="ml-1.5 h-4 w-4" />
-            </Button>
-          </div>
         </div>
 
-        <div className="mt-12 rounded-3xl border border-border/70 bg-background/60 p-5 sm:p-8">
-          <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
-            <div className="max-w-2xl">
-              <div className="text-xs uppercase tracking-wider text-[var(--fubrio-accent)] font-semibold">Fubrio Hosting</div>
-              <h3 className="mt-2 font-display text-2xl sm:text-3xl font-semibold">Hosting that fits the project.</h3>
-              <p className="mt-2 text-sm sm:text-base text-muted-foreground">Servers, websites, bots, databases, storage, and deployment support. Open a service to see its available plans and request a setup.</p>
+        {hasStudioServices && (
+          <div className="mt-14 border-t border-border pt-8">
+            <div className="flex flex-wrap items-baseline justify-between gap-3">
+              <h3 className="font-display text-[1.6rem]">Also on the menu</h3>
+              <span className="font-mono text-[11px] text-muted-foreground">
+                {categorized.reduce((n, g) => n + g.services.length, 0) + uncategorized.length} services
+              </span>
             </div>
-            <div className="flex flex-wrap gap-2 sm:justify-end">
-              <Button variant="outline" className="rounded-full" onClick={() => setHostingOpen((open) => !open)}>
-                {hostingOpen ? "Hide services" : "Explore hosting"}
-                <ArrowUpRight className="ml-1.5 h-4 w-4" />
-              </Button>
-              <Button variant="outline" className="rounded-full" onClick={() => navigate("#contact")}>
-                Talk to us <ArrowUpRight className="ml-1.5 h-4 w-4" />
-              </Button>
-            </div>
-          </div>
-          {hostingOpen && <div className="mt-7 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-            {HOSTING_SERVICES.map((hosting) => {
-              const HostingIcon = hosting.icon;
-              return (
-                <button key={hosting.title} type="button" onClick={() => setSelectedHosting(hosting)} className="group rounded-2xl border border-border/70 bg-card/50 p-5 text-left transition-colors hover:border-[var(--fubrio-accent)] hover:bg-[var(--fubrio-accent-soft)]">
-                  <div className="flex items-start justify-between gap-3">
-                    <div className="flex h-10 w-10 items-center justify-center rounded-xl border border-border bg-background">
-                      <HostingIcon className="h-5 w-5" />
-                    </div>
-                    <ArrowUpRight className="h-4 w-4 text-muted-foreground transition-transform group-hover:-translate-y-0.5 group-hover:translate-x-0.5" />
-                  </div>
-                  <h4 className="mt-5 font-display text-lg font-semibold">{hosting.title}</h4>
-                  <p className="mt-1 min-h-12 text-sm text-muted-foreground">{hosting.summary}</p>
-                  <div className="mt-4 flex items-center justify-between gap-3 text-sm">
-                    <div><div className="font-medium">{enforceMinimumInr(hosting.from)}</div><UsdPrice price={hosting.from} rate={usdRate} /></div>
-                    <span className="text-muted-foreground">View plans</span>
-                  </div>
-                </button>
-              );
-            })}
-          </div>} 
-        </div>
 
-        <div className="mt-8 rounded-3xl border border-border/70 bg-background/60 p-5 sm:p-8">
-          <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
-            <div className="max-w-2xl">
-              <div className="text-xs uppercase tracking-wider text-[var(--fubrio-accent)] font-semibold">App Development</div>
-              <h3 className="mt-2 font-display text-2xl sm:text-3xl font-semibold">Apps built around your idea.</h3>
-              <p className="mt-2 text-sm sm:text-base text-muted-foreground">Android, iOS, cross-platform, business, e-commerce, social, AI, and custom app work. Open a service to view its starting plans.</p>
-            </div>
-            <div className="flex flex-wrap gap-2 sm:justify-end">
-              <Button variant="outline" className="rounded-full" onClick={() => setAppDevelopmentOpen((open) => !open)}>
-                {appDevelopmentOpen ? "Hide services" : "Explore app development"}
-                <ArrowUpRight className="ml-1.5 h-4 w-4" />
-              </Button>
-              <Button variant="outline" className="rounded-full" onClick={() => navigate("#contact")}>
-                Talk to us <ArrowUpRight className="ml-1.5 h-4 w-4" />
-              </Button>
+            <div className="mt-5 space-y-8">
+              {categorized.map(({ category, services: catServices }) => (
+                <div key={category.id}>
+                  <div className="mb-1 flex items-center gap-2">
+                    {(category as any).image && (
+                      <img
+                        src={(category as any).image}
+                        alt=""
+                        width={20}
+                        height={20}
+                        loading="lazy"
+                        className="h-5 w-5 border border-border object-cover"
+                      />
+                    )}
+                    <h4 className="text-sm font-medium">{category.name}</h4>
+                  </div>
+                  {category.description && (
+                    <p className="mb-2 text-[13px] text-muted-foreground">{category.description}</p>
+                  )}
+                  <div className="grid gap-x-10 border-t border-border sm:grid-cols-2">
+                    {catServices.map((s) => (
+                      <ServiceCard key={s.id} service={s} rate={usdRate} />
+                    ))}
+                  </div>
+                </div>
+              ))}
+
+              {uncategorized.length > 0 && (
+                <div className="grid gap-x-10 border-t border-border sm:grid-cols-2">
+                  {uncategorized.map((s) => (
+                    <ServiceCard key={s.id} service={s} rate={usdRate} />
+                  ))}
+                </div>
+              )}
             </div>
           </div>
-          {appDevelopmentOpen && <div className="mt-7 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-            {APP_DEVELOPMENT_SERVICES.map((appService) => {
-              const AppIcon = appService.icon;
-              return (
-                <button key={appService.title} type="button" onClick={() => setSelectedAppService(appService)} className="group rounded-2xl border border-border/70 bg-card/50 p-5 text-left transition-colors hover:border-[var(--fubrio-accent)] hover:bg-[var(--fubrio-accent-soft)]">
-                  <div className="flex items-start justify-between gap-3">
-                    <div className="flex h-10 w-10 items-center justify-center rounded-xl border border-border bg-background">
-                      <AppIcon className="h-5 w-5" />
-                    </div>
-                    <ArrowUpRight className="h-4 w-4 text-muted-foreground transition-transform group-hover:-translate-y-0.5 group-hover:translate-x-0.5" />
-                  </div>
-                  <h4 className="mt-5 font-display text-lg font-semibold">{appService.title}</h4>
-                  <p className="mt-1 min-h-12 text-sm text-muted-foreground">{appService.summary}</p>
-                  <div className="mt-4 flex items-center justify-between gap-3 text-sm">
-                    <div><div className="font-medium">{enforceMinimumInr(appService.from)}</div><UsdPrice price={appService.from} rate={usdRate} /></div>
-                    <span className="text-muted-foreground">View plans</span>
-                  </div>
-                </button>
-              );
-            })}
-          </div>}
-        </div>
-
-        <div className="mt-8 rounded-3xl border border-border/70 bg-background/60 p-5 sm:p-8">
-          <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
-            <div className="max-w-2xl">
-              <div className="text-xs uppercase tracking-wider text-[var(--fubrio-accent)] font-semibold">Web Development</div>
-              <h3 className="mt-2 font-display text-2xl sm:text-3xl font-semibold">Websites that fit the work.</h3>
-              <p className="mt-2 text-sm sm:text-base text-muted-foreground">Landing pages, business websites, stores, web apps, SaaS products, dashboards, and custom web projects.</p>
-            </div>
-            <div className="flex flex-wrap gap-2 sm:justify-end">
-              <Button variant="outline" className="rounded-full" onClick={() => setWebDevelopmentOpen((open) => !open)}>
-                {webDevelopmentOpen ? "Hide services" : "Explore web development"}
-                <ArrowUpRight className="ml-1.5 h-4 w-4" />
-              </Button>
-              <Button variant="outline" className="rounded-full" onClick={() => navigate("#contact")}>
-                Talk to us <ArrowUpRight className="ml-1.5 h-4 w-4" />
-              </Button>
-            </div>
-          </div>
-          {webDevelopmentOpen && <div className="mt-7 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-            {WEB_DEVELOPMENT_SERVICES.map((webService) => {
-              const WebIcon = webService.icon;
-              return (
-                <button key={webService.title} type="button" onClick={() => setSelectedWebService(webService)} className="group rounded-2xl border border-border/70 bg-card/50 p-5 text-left transition-colors hover:border-[var(--fubrio-accent)] hover:bg-[var(--fubrio-accent-soft)]">
-                  <div className="flex items-start justify-between gap-3">
-                    <div className="flex h-10 w-10 items-center justify-center rounded-xl border border-border bg-background">
-                      <WebIcon className="h-5 w-5" />
-                    </div>
-                    <ArrowUpRight className="h-4 w-4 text-muted-foreground transition-transform group-hover:-translate-y-0.5 group-hover:translate-x-0.5" />
-                  </div>
-                  <h4 className="mt-5 font-display text-lg font-semibold">{webService.title}</h4>
-                  <p className="mt-1 min-h-12 text-sm text-muted-foreground">{webService.summary}</p>
-                  <div className="mt-4 flex items-center justify-between gap-3 text-sm">
-                    <div><div className="font-medium">{enforceMinimumInr(webService.from)}</div><UsdPrice price={webService.from} rate={usdRate} /></div>
-                    <span className="text-muted-foreground">View plans</span>
-                  </div>
-                </button>
-              );
-            })}
-          </div>}
-        </div>
-
-
-        <ServiceCollectionSection
-          label="Software Development"
-          heading="Software shaped around the work."
-          description="Custom software, desktop applications, business systems, APIs, databases, integrations, and maintenance."
-          open={softwareDevelopmentOpen}
-          onToggle={() => setSoftwareDevelopmentOpen((open) => !open)}
-          services={SOFTWARE_DEVELOPMENT_SERVICES}
-          onSelect={setSelectedSoftwareService}
-          buttonLabel="Explore software development"
-          rate={usdRate}
-        />
-
-        <ServiceCollectionSection
-          label="AI and Automation"
-          heading="Useful AI and automation, built for the task."
-          description="Chatbots, assistants, AI applications, agents, business automation, knowledge systems, and custom integrations."
-          open={aiAutomationOpen}
-          onToggle={() => setAiAutomationOpen((open) => !open)}
-          services={AI_AUTOMATION_SERVICES}
-          onSelect={setSelectedAiService}
-          buttonLabel="Explore AI and automation"
-          rate={usdRate}
-        />
-
-        <ServiceCollectionSection
-          label="Game Development"
-          heading="Games built around the way you want to play."
-          description="Prototypes, 2D and 3D games, mobile and PC projects, multiplayer systems, Minecraft work, assets, and maintenance."
-          open={gameDevelopmentOpen}
-          onToggle={() => setGameDevelopmentOpen((open) => !open)}
-          services={GAME_DEVELOPMENT_SERVICES}
-          onSelect={setSelectedGameService}
-          buttonLabel="Explore game development"
-          rate={usdRate}
-        />
-
-        <ServiceCollectionSection
-          label="Minecraft"
-          heading="Minecraft services for servers and communities."
-          description="Server setup, plugins, mods, builds, skins, texture packs, SMP systems, minigames, optimization, and maintenance."
-          open={minecraftOpen}
-          onToggle={() => setMinecraftOpen((open) => !open)}
-          services={MINECRAFT_SERVICES}
-          onSelect={setSelectedMinecraftService}
-          buttonLabel="Explore Minecraft services"
-          rate={usdRate}
-        />
-
-        <ServiceCollectionSection
-          label="Vidz and Motions"
-          heading="Video and motion work for your next release."
-          description="Video editing, shorts, gaming videos, motion graphics, animation, promotional content, and custom production."
-          open={videoMotionOpen}
-          onToggle={() => setVideoMotionOpen((open) => !open)}
-          services={VIDEO_MOTION_SERVICES}
-          onSelect={setSelectedVideoMotionService}
-          buttonLabel="Explore video and motion"
-          rate={usdRate}
-        />
-
-        <ServiceCollectionSection
-          label="Business Solutions"
-          heading="Technology built around your business."
-          description="Business websites, management systems, CRM, inventory, billing, booking, analytics, automation, integrations, and maintenance."
-          open={businessSolutionsOpen}
-          onToggle={() => setBusinessSolutionsOpen((open) => !open)}
-          services={BUSINESS_SOLUTIONS_SERVICES}
-          onSelect={setSelectedBusinessSolutionsService}
-          buttonLabel="Explore business solutions"
-          rate={usdRate}
-        />
-
-        <ServiceCollectionSection
-          label="Marketing"
-          heading="Marketing built around your audience and goals."
-          description="Social media, advertising, SEO, content, campaigns, analytics, consultation, and brand promotion."
-          open={marketingOpen}
-          onToggle={() => setMarketingOpen((open) => !open)}
-          services={MARKETING_SERVICES}
-          onSelect={setSelectedMarketingService}
-          buttonLabel="Explore marketing services"
-          rate={usdRate}
-        />
-
-        <ServiceCollectionSection
-          label="Creator Services"
-          heading="Tools and services for creators building their presence."
-          description="YouTube, video editing, branding, streaming, social media, portfolios, growth, assets, and consultation."
-          open={creatorServicesOpen}
-          onToggle={() => setCreatorServicesOpen((open) => !open)}
-          services={CREATOR_SERVICES}
-          onSelect={setSelectedCreatorService}
-          buttonLabel="Explore creator services"
-          rate={usdRate}
-        />
-
-        <ServiceCollectionSection
-          label="Fubz Security"
-          heading="Security services for systems you own or are explicitly authorized to test."
-          description="Website, application, server, Discord, Minecraft, API, database, monitoring, recovery, maintenance, consultation, and responsible security testing. All testing requires explicit client authorization."
-          open={fubzSecurityOpen}
-          onToggle={() => setFubzSecurityOpen((open) => !open)}
-          services={FUBZ_SECURITY_SERVICES}
-          onSelect={setSelectedFubzSecurityService}
-          buttonLabel="Explore Fubz Security"
-          rate={usdRate}
-        />
-
-        <ServiceCollectionSection
-          label="Community Services"
-          heading="Build, organize, automate, and grow your community."
-          description="Discord setup, structure, bots, engagement, events, websites, portals, branding, moderation, growth, and maintenance."
-          open={communityServicesOpen}
-          onToggle={() => setCommunityServicesOpen((open) => !open)}
-          services={COMMUNITY_SERVICES}
-          onSelect={setSelectedCommunityService}
-          buttonLabel="Explore community services"
-          rate={usdRate}
-        />
-
-        <ServiceCollectionSection
-          label="Maintenance"
-          heading="Keep your projects reliable and up to date."
-          description="Website, app, software, server, Minecraft, Discord, database, AI, emergency, and ongoing maintenance services."
-          open={maintenanceOpen}
-          onToggle={() => setMaintenanceOpen((open) => !open)}
-          services={MAINTENANCE_SERVICES}
-          onSelect={setSelectedMaintenanceService}
-          buttonLabel="Explore maintenance services"
-          rate={usdRate}
-        />
-
-        <ServiceCollectionSection
-          label="Consulting"
-          heading="Clear technical direction for your next step."
-          description="Technology, website, app, software, AI, business, infrastructure, security, creator, project, and consultation packages."
-          open={consultingOpen}
-          onToggle={() => setConsultingOpen((open) => !open)}
-          services={CONSULTING_SERVICES}
-          onSelect={setSelectedConsultingService}
-          buttonLabel="Explore consulting services"
-          rate={usdRate}
-        />
-
-        <ServiceCollectionSection
-          label="Dezign by Fubrio"
-          heading="Design that gives your work a clear identity."
-          description="Logos, branding, creator graphics, social media assets, UI and UX design, presentations, and custom design work."
-          open={designBrandingOpen}
-          onToggle={() => setDesignBrandingOpen((open) => !open)}
-          services={DESIGN_BRANDING_SERVICES}
-          onSelect={setSelectedDesignService}
-          buttonLabel="Explore design services"
-          rate={usdRate}
-        />
-
-        <ServiceCollectionSection
-          label="Discord"
-          heading="Discord setup, bots, and community systems."
-          description="Server structure, bots, moderation, tickets, integrations, graphics, maintenance, and custom Discord development."
-          open={discordOpen}
-          onToggle={() => setDiscordOpen((open) => !open)}
-          services={DISCORD_SERVICES}
-          onSelect={setSelectedDiscordService}
-          buttonLabel="Explore Discord services"
-          rate={usdRate}
-        />
-
-        <div className="mt-12 space-y-10">
-          {categorized.map(({ category, services: catServices }) => (
-            <div key={category.id}>
-              <div className="flex items-center gap-3 mb-5">
-                {category.image && <img src={category.image} alt="" className="h-8 w-8 rounded-lg object-cover" />}
-                <h3 className="font-display text-xl font-semibold">{category.name}</h3>
-                <Badge variant="outline" className="text-[10px]">{catServices.length}</Badge>
-              </div>
-              {category.description && <p className="text-sm text-muted-foreground mb-4 -mt-3">{category.description}</p>}
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
-                {catServices.map((s) => <ServiceCard key={s.id} service={s} rate={usdRate} />)}
-              </div>
-            </div>
-          ))}
-
-          {uncategorized.length > 0 && (
-            <div>
-              {categorized.length > 0 && <h3 className="font-display text-xl font-semibold mb-5">Other</h3>}
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
-                {uncategorized.map((s) => <ServiceCard key={s.id} service={s} rate={usdRate} />)}
-              </div>
-            </div>
-          )}
-
-
-        </div>
+        )}
       </div>
-      {selectedHosting && (
-        <HostingDetails service={selectedHosting} rate={usdRate} onClose={() => setSelectedHosting(null)} />
-      )}
-      {selectedAppService && (
-        <AppDevelopmentDetails service={selectedAppService} rate={usdRate} onClose={() => setSelectedAppService(null)} />
-      )}
-      {selectedWebService && (
-        <AppDevelopmentDetails service={selectedWebService} rate={usdRate} onClose={() => setSelectedWebService(null)} />
-      )}
-      {selectedSoftwareService && (
-        <AppDevelopmentDetails service={selectedSoftwareService} rate={usdRate} onClose={() => setSelectedSoftwareService(null)} />
-      )}
-      {selectedAiService && (
-        <AppDevelopmentDetails service={selectedAiService} rate={usdRate} onClose={() => setSelectedAiService(null)} />
-      )}
-      {selectedGameService && (
-        <AppDevelopmentDetails service={selectedGameService} rate={usdRate} onClose={() => setSelectedGameService(null)} />
-      )}
-      {selectedMinecraftService && (
-        <AppDevelopmentDetails service={selectedMinecraftService} rate={usdRate} onClose={() => setSelectedMinecraftService(null)} />
-      )}
-      {selectedVideoMotionService && (
-        <AppDevelopmentDetails service={selectedVideoMotionService} rate={usdRate} onClose={() => setSelectedVideoMotionService(null)} />
-      )}
-      {selectedBusinessSolutionsService && (
-        <AppDevelopmentDetails service={selectedBusinessSolutionsService} rate={usdRate} onClose={() => setSelectedBusinessSolutionsService(null)} />
-      )}
-      {selectedMarketingService && (
-        <AppDevelopmentDetails service={selectedMarketingService} rate={usdRate} onClose={() => setSelectedMarketingService(null)} />
-      )}
-      {selectedCreatorService && (
-        <AppDevelopmentDetails service={selectedCreatorService} rate={usdRate} onClose={() => setSelectedCreatorService(null)} />
-      )}
-      {selectedFubzSecurityService && (
-        <AppDevelopmentDetails service={selectedFubzSecurityService} rate={usdRate} onClose={() => setSelectedFubzSecurityService(null)} />
-      )}
-      {selectedCommunityService && (
-        <AppDevelopmentDetails service={selectedCommunityService} rate={usdRate} onClose={() => setSelectedCommunityService(null)} />
-      )}
-      {selectedMaintenanceService && (
-        <AppDevelopmentDetails service={selectedMaintenanceService} rate={usdRate} onClose={() => setSelectedMaintenanceService(null)} />
-      )}
-      {selectedConsultingService && (
-        <AppDevelopmentDetails service={selectedConsultingService} rate={usdRate} onClose={() => setSelectedConsultingService(null)} />
-      )}
-      {selectedDesignService && (
-        <AppDevelopmentDetails service={selectedDesignService} rate={usdRate} onClose={() => setSelectedDesignService(null)} />
-      )}
-      {selectedDiscordService && (
-        <AppDevelopmentDetails service={selectedDiscordService} rate={usdRate} onClose={() => setSelectedDiscordService(null)} />
+
+      {selected && (
+        <ServiceDetails
+          service={selected}
+          rate={usdRate}
+          onClose={() => setSelected(null)}
+        />
       )}
     </section>
   );
 }
 
-
-function ServiceCollectionSection({
-  label,
-  heading,
-  description,
-  open,
-  onToggle,
-  services,
-  onSelect,
-  buttonLabel,
+function ServiceDetails({
+  service,
   rate,
+  onClose,
 }: {
-  label: string;
-  heading: string;
-  description: string;
-  open: boolean;
-  onToggle: () => void;
-  services: AppService[];
-  onSelect: (service: AppService) => void;
-  buttonLabel: string;
+  service: AppService;
   rate: number;
+  onClose: () => void;
 }) {
-  return (
-    <div className="mt-8 rounded-3xl border border-border/70 bg-background/60 p-5 sm:p-8">
-      <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
-        <div className="max-w-2xl">
-          <div className="text-xs uppercase tracking-wider text-[var(--fubrio-accent)] font-semibold">{label}</div>
-          <h3 className="mt-2 font-display text-2xl sm:text-3xl font-semibold">{heading}</h3>
-          <p className="mt-2 text-sm sm:text-base text-muted-foreground">{description}</p>
-        </div>
-        <div className="flex flex-wrap gap-2 sm:justify-end">
-          <Button variant="outline" className="rounded-full" onClick={onToggle}>
-            {open ? "Hide services" : buttonLabel}
-            <ArrowUpRight className="ml-1.5 h-4 w-4" />
-          </Button>
-          <Button variant="outline" className="rounded-full" onClick={() => navigate("#contact")}>
-            Talk to us <ArrowUpRight className="ml-1.5 h-4 w-4" />
-          </Button>
-        </div>
-      </div>
-      {open && (
-        <div className="mt-7 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-          {services.map((service) => {
-            const Icon = service.icon;
-            return (
-              <button key={service.title} type="button" onClick={() => onSelect(service)} className="group rounded-2xl border border-border/70 bg-card/50 p-5 text-left transition-colors hover:border-[var(--fubrio-accent)] hover:bg-[var(--fubrio-accent-soft)]">
-                <div className="flex items-start justify-between gap-3">
-                  <div className="flex h-10 w-10 items-center justify-center rounded-xl border border-border bg-background">
-                    <Icon className="h-5 w-5" />
-                  </div>
-                  <ArrowUpRight className="h-4 w-4 text-muted-foreground transition-transform group-hover:-translate-y-0.5 group-hover:translate-x-0.5" />
-                </div>
-                <h4 className="mt-5 font-display text-lg font-semibold">{service.title}</h4>
-                <p className="mt-1 min-h-12 text-sm text-muted-foreground">{service.summary}</p>
-                <div className="mt-4 flex items-center justify-between gap-3 text-sm">
-                  <div><div className="font-medium">{enforceMinimumInr(service.from)}</div><UsdPrice price={service.from} rate={rate} /></div>
-                  <span className="text-muted-foreground">View plans</span>
-                </div>
-              </button>
-            );
-          })}
-        </div>
-      )}
-    </div>
-  );
-}
-
-function HostingDetails({ service, rate, onClose }: { service: HostingService; rate: number; onClose: () => void }) {
   const Icon = service.icon;
+
+  useEffect(() => {
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === "Escape") onClose();
+    };
+    window.addEventListener("keydown", onKey);
+    const previous = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+    return () => {
+      window.removeEventListener("keydown", onKey);
+      document.body.style.overflow = previous;
+    };
+  }, [onClose]);
+
   return (
-    <div className="fixed inset-0 z-[70] flex items-end sm:items-center justify-center bg-black/70 p-0 sm:p-6" role="dialog" aria-modal="true" aria-label={`${service.title} plans`}>
-      <div className="flex max-h-[92vh] w-full max-w-4xl flex-col overflow-hidden rounded-t-3xl sm:rounded-3xl border border-border bg-background shadow-2xl">
-        <div className="flex items-start justify-between gap-4 border-b border-border p-5 sm:p-7">
+    <div
+      className="fixed inset-0 z-[70] flex items-end justify-center bg-foreground/40 p-0 sm:items-center sm:p-6"
+      role="dialog"
+      aria-modal="true"
+      aria-label={`${service.title} plans`}
+      onClick={onClose}
+    >
+      <div
+        className="flex max-h-[92vh] w-full max-w-3xl flex-col overflow-hidden border border-border bg-background shadow-[8px_8px_0_0_rgba(0,0,0,0.12)] animate-fade-in"
+        onClick={(e) => e.stopPropagation()}
+      >
+        <div className="flex items-start justify-between gap-4 border-b border-border p-5 sm:p-6">
           <div className="flex items-start gap-3">
-            <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl border border-border bg-card">
-              <Icon className="h-5 w-5" />
-            </div>
+            <span className="mt-0.5 flex h-9 w-9 shrink-0 items-center justify-center border border-border">
+              <Icon className="h-4 w-4" />
+            </span>
             <div>
-              <h3 className="font-display text-xl sm:text-2xl font-semibold">{service.title}</h3>
-              <p className="mt-1 max-w-2xl text-sm text-muted-foreground">{service.summary}</p>
+              <div className="eyebrow">Plans and pricing</div>
+              <h3 className="mt-1 font-display text-[1.6rem] leading-tight">{service.title}</h3>
+              <p className="mt-1 max-w-xl text-sm text-muted-foreground">{service.summary}</p>
             </div>
           </div>
-          <button type="button" onClick={onClose} aria-label="Close plans" className="rounded-full border border-border p-2 text-muted-foreground hover:text-foreground">
+          <button
+            type="button"
+            onClick={onClose}
+            aria-label="Close plans"
+            className="flex h-8 w-8 shrink-0 items-center justify-center border border-border text-muted-foreground transition-colors hover:text-foreground"
+          >
             <X className="h-4 w-4" />
           </button>
         </div>
-        <div className="overflow-y-auto p-5 sm:p-7">
-          <div className="grid gap-2 sm:grid-cols-2">
-            {service.features.map((feature) => (
-              <div key={feature} className="flex items-start gap-2 text-sm text-muted-foreground">
-                <Check className="mt-0.5 h-4 w-4 shrink-0 text-[var(--fubrio-accent)]" />
-                <span>{feature}</span>
-              </div>
-            ))}
-          </div>
-          <div className="mt-7 grid grid-cols-1 gap-3 sm:grid-cols-2">
+
+        <div className="overflow-y-auto p-5 sm:p-6">
+          {service.features.length > 0 && (
+            <ul className="mb-5 grid gap-x-6 gap-y-1.5 sm:grid-cols-2">
+              {service.features.map((feature) => (
+                <li key={feature} className="flex items-start gap-2 text-[13px] text-muted-foreground">
+                  <Check className="mt-0.5 h-3.5 w-3.5 shrink-0 text-[var(--fubrio-accent)]" aria-hidden />
+                  <span>{feature}</span>
+                </li>
+              ))}
+            </ul>
+          )}
+
+          <div className="grid grid-cols-1 border-l border-t border-border sm:grid-cols-2">
             {service.plans.map((plan) => (
-              <div key={`${plan.name}-${plan.price}`} className="rounded-2xl border border-border/80 bg-card/40 p-4">
-                <div className="flex items-start justify-between gap-3">
-                  <h4 className="font-display font-semibold">{plan.name}</h4>
-                  <div className="text-right"><div className="text-sm font-semibold">{enforceMinimumInr(plan.price)}</div><UsdPrice price={plan.price} rate={rate} /></div>
+              <div
+                key={`${plan.name}-${plan.price}`}
+                className="border-b border-r border-border p-4"
+              >
+                <div className="flex items-baseline justify-between gap-3">
+                  <h4 className="text-[0.9375rem] font-medium">{plan.name}</h4>
+                  <span className="shrink-0 text-right font-mono text-[11px]">
+                    {enforceMinimumInr(plan.price)}
+                  </span>
                 </div>
-                <ul className="mt-3 space-y-1.5">
-                  {plan.specs.map((spec) => <li key={spec} className="text-sm text-muted-foreground">{spec}</li>)}
+                <ul className="mt-2 space-y-1">
+                  {plan.specs.map((spec) => (
+                    <li key={spec} className="text-[13px] leading-relaxed text-muted-foreground">
+                      {spec}
+                    </li>
+                  ))}
                 </ul>
+                <UsdPrice price={plan.price} rate={rate} />
               </div>
             ))}
           </div>
-          <div className="mt-7 flex flex-col gap-3 rounded-2xl border border-border/70 bg-card/40 p-4 sm:flex-row sm:items-center sm:justify-between">
-            <div>
-              <div className="font-medium">Need a different setup?</div>
-              <p className="mt-1 text-sm text-muted-foreground">Tell us what you need and we can discuss a custom option.</p>
-            </div>
-            <Button className="rounded-full shrink-0" onClick={() => { onClose(); navigate("#contact"); }}>
-              Contact Fubrio <ArrowUpRight className="ml-1.5 h-4 w-4" />
-            </Button>
-          </div>
-        </div>
-      </div>
-    </div>
-  );
-}
 
-
-function AppDevelopmentDetails({ service, rate, onClose }: { service: AppService; rate: number; onClose: () => void }) {
-  const Icon = service.icon;
-  return (
-    <div className="fixed inset-0 z-[70] flex items-end sm:items-center justify-center bg-black/70 p-0 sm:p-6" role="dialog" aria-modal="true" aria-label={`${service.title} plans`}>
-      <div className="flex max-h-[92vh] w-full max-w-4xl flex-col overflow-hidden rounded-t-3xl sm:rounded-3xl border border-border bg-background shadow-2xl">
-        <div className="flex items-start justify-between gap-4 border-b border-border p-5 sm:p-7">
-          <div className="flex items-start gap-3">
-            <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl border border-border bg-card"><Icon className="h-5 w-5" /></div>
-            <div><h3 className="font-display text-xl sm:text-2xl font-semibold">{service.title}</h3><p className="mt-1 max-w-2xl text-sm text-muted-foreground">{service.summary}</p></div>
+          <div className="mt-5 flex flex-col gap-3 border-t border-border pt-4 sm:flex-row sm:items-center sm:justify-between">
+            <p className="text-[13px] text-muted-foreground">
+              Need a different size? Tell us the requirement and we will quote it.
+            </p>
+            <button
+              className="btn-ink shrink-0"
+              onClick={() => {
+                onClose();
+                navigate("#contact");
+              }}
+            >
+              Contact Fubrio <ArrowUpRight className="h-4 w-4" />
+            </button>
           </div>
-          <button type="button" onClick={onClose} aria-label="Close plans" className="rounded-full border border-border p-2 text-muted-foreground hover:text-foreground"><X className="h-4 w-4" /></button>
-        </div>
-        <div className="overflow-y-auto p-5 sm:p-7">
-          <div className="grid gap-2 sm:grid-cols-2">{service.features.map((feature) => <div key={feature} className="flex items-start gap-2 text-sm text-muted-foreground"><Check className="mt-0.5 h-4 w-4 shrink-0 text-[var(--fubrio-accent)]" /><span>{feature}</span></div>)}</div>
-          <div className="mt-7 grid grid-cols-1 gap-3 sm:grid-cols-2">
-            {service.plans.map((plan) => <div key={`${plan.name}-${plan.price}`} className="rounded-2xl border border-border/80 bg-card/40 p-4"><div className="flex items-start justify-between gap-3"><h4 className="font-display font-semibold">{plan.name}</h4><div className="text-right"><div className="text-sm font-semibold">{enforceMinimumInr(plan.price)}</div><UsdPrice price={plan.price} rate={rate} /></div></div><ul className="mt-3 space-y-1.5">{plan.specs.map((spec) => <li key={spec} className="text-sm text-muted-foreground">{spec}</li>)}</ul></div>)}
-          </div>
-          <div className="mt-7 flex flex-col gap-3 rounded-2xl border border-border/70 bg-card/40 p-4 sm:flex-row sm:items-center sm:justify-between"><div><div className="font-medium">Have a different app idea?</div><p className="mt-1 text-sm text-muted-foreground">Share the features you need and we can discuss the scope.</p></div><Button className="rounded-full shrink-0" onClick={() => { onClose(); navigate("#contact"); }}>Contact Fubrio <ArrowUpRight className="ml-1.5 h-4 w-4" /></Button></div>
         </div>
       </div>
     </div>
@@ -1664,50 +1508,26 @@ function AppDevelopmentDetails({ service, rate, onClose }: { service: AppService
 function ServiceCard({ service, rate }: { service: SerializedService; rate: number }) {
   const s = service as any;
   const Icon = ICONS[s.icon ?? ""] ?? Code2;
-  const img = s.image;
+
   return (
-    <div className="group relative rounded-2xl glass-card overflow-hidden transition-all hover:-translate-y-0.5">
-      {img && (
-        <div className="aspect-[16/10] relative overflow-hidden">
-          <img src={img} alt={s.title} className="absolute inset-0 h-full w-full object-cover transition-transform duration-500 group-hover:scale-105" />
-        </div>
-      )}
-      <div className="p-6">
-        <div className="flex items-start justify-between">
-          {!img && (
-            <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-background border border-border group-hover:bg-[var(--fubrio-accent-soft)] transition-colors">
-              <Icon className="h-5 w-5" />
-            </div>
-          )}
-          <div className="text-right ml-auto">
-            <div className="text-xs text-muted-foreground capitalize">{s.pricingType}</div>
-            <div className="font-display font-semibold">{formatPrice(s)}</div><UsdPrice price={formatPrice(s)} rate={rate} />
-          </div>
-        </div>
-        <h3 className="mt-5 text-lg font-display font-semibold">{s.title}</h3>
-        <p className="mt-1 text-sm text-muted-foreground line-clamp-2">{s.shortDesc}</p>
-        {s.features && s.features.length > 0 && (
-          <ul className="mt-4 space-y-1.5">
-            {s.features.slice(0, 4).map((f: string, i: number) => (
-              <li key={i} className="flex items-start gap-2 text-xs text-muted-foreground">
-                <Check className="h-3.5 w-3.5 text-[var(--fubrio-accent)] flex-shrink-0 mt-0.5" />
-                <span>{f}</span>
-              </li>
-            ))}
-          </ul>
-        )}
-        <div className="mt-5">
-          <Button
-            size="sm"
-            variant="outline"
-            className="rounded-full w-full"
-            onClick={() => navigate(s.contactEnabled ? "#contact" : s.purchaseUrl ? s.purchaseUrl : "#contact")}
-          >
-            {s.ctaText || (s.contactEnabled ? "Contact us" : s.purchaseUrl ? "Buy now" : "Get a quote")}
-            <ArrowUpRight className="ml-1.5 h-3.5 w-3.5" />
-          </Button>
-        </div>
-      </div>
-    </div>
+    <button
+      onClick={() => navigate(s.contactEnabled ? "#contact" : s.purchaseUrl ? s.purchaseUrl : "#contact")}
+      className="group flex w-full items-start gap-3 border-b border-border py-3.5 text-left"
+    >
+      <Icon className="mt-1 h-4 w-4 shrink-0 text-muted-foreground" aria-hidden />
+      <span className="min-w-0 flex-1">
+        <span className="flex flex-wrap items-baseline gap-x-2">
+          <span className="text-[0.9375rem] font-medium transition-colors group-hover:text-[var(--fubrio-accent)]">
+            {s.title}
+          </span>
+          <span className="font-mono text-[11px] text-muted-foreground">{formatPrice(s)}</span>
+        </span>
+        <span className="mt-0.5 line-clamp-2 block text-[13px] leading-relaxed text-muted-foreground">
+          {s.shortDesc}
+        </span>
+        <UsdPrice price={formatPrice(s)} rate={rate} />
+      </span>
+      <ArrowUpRight className="mt-1 h-3.5 w-3.5 shrink-0 text-muted-foreground transition-transform group-hover:-translate-y-0.5 group-hover:translate-x-0.5" />
+    </button>
   );
 }

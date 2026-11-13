@@ -2,13 +2,12 @@
 
 import { useState, useEffect, useMemo } from "react";
 import dynamic from "next/dynamic";
-import { Loader2, ArrowLeft } from "lucide-react";
+import { Loader2, ArrowLeft, ArrowUpRight } from "lucide-react";
 import { getBrandConfig, applyBrandCssVars } from "@/lib/brand";
 import type { BrandId, BrandConfig } from "@/lib/brand";
 import { Navbar } from "@/components/site/navbar";
 import { Footer } from "@/components/site/footer";
 import { Hero } from "@/components/site/hero";
-import { Metrics } from "@/components/site/metrics";
 import { FeaturedShowcase } from "@/components/site/featured-showcase";
 import { Ecosystem } from "@/components/site/ecosystem";
 import { ServicesGrid } from "@/components/site/services-grid";
@@ -16,30 +15,12 @@ import { SponsorsMarquee } from "@/components/site/sponsors-marquee";
 import { PartnersGrid } from "@/components/site/partners-grid";
 import { Community } from "@/components/site/community";
 import { Testimonials } from "@/components/site/testimonials";
+import { DonatorsSection } from "@/components/site/donators-section";
 import { BlogPreview } from "@/components/site/blog-preview";
 import { TeamSection } from "@/components/site/team-section";
 import { DonationBanner } from "@/components/site/donation-banner";
-import { DonatorsSection } from "@/components/site/donators-section";
-import { ShopView } from "@/components/site/shop-view";
-import { AnnouncementsView } from "@/components/site/announcements-view";
-import { FloatingAnnouncementsButton } from "@/components/site/floating-announcements-button";
-import { ApiKeysView } from "@/components/site/api-keys-view";
-import { DocsView } from "@/components/site/docs-view";
-import { CustomerChatView } from "@/components/site/customer-chat-view";
-import { SubscriptionsView } from "@/components/site/subscriptions-view";
-import { BloomCommandsShowcase } from "@/components/site/bloom-commands-showcase";
-import { BloomBotStatus } from "@/components/site/bloom-bot-status";
-import { BloomDashboardPlaceholder } from "@/components/site/bloom-dashboard";
-import { BloomHomeView } from "@/components/site/bloom-home-view";
-import { BloomDocsView } from "@/components/site/bloom-docs-view";
 import { ContactCTA } from "@/components/site/contact-cta";
 import { SearchOverlay } from "@/components/site/search-overlay";
-import { FaqView } from "@/components/site/faq-view";
-import { StaticPage } from "@/components/site/static-page";
-import { ShowcaseView } from "@/components/showcase/showcase-view";
-import { ProjectDetail } from "@/components/showcase/project-detail";
-import { ProductsView, ProductDetail } from "@/components/products/products-view";
-import { BlogView, BlogDetail } from "@/components/blog/blog-view";
 import { useHashRoute, navigate } from "@/lib/router";
 import type {
   SerializedProject, SerializedProduct, SerializedPost, SerializedSponsor,
@@ -48,29 +29,41 @@ import type {
   SerializedPage,
 } from "@/lib/types";
 
+const viewLoading = () => (
+  <div className="flex min-h-[50vh] items-center justify-center text-muted-foreground">
+    <Loader2 className="h-5 w-5 animate-spin" />
+  </div>
+);
+
 const AdminRouter = dynamic(
   () => import("@/components/admin/admin-router").then((m) => m.AdminRouter),
-  {
-    loading: () => (
-      <div className="min-h-screen flex items-center justify-center text-muted-foreground">
-        <Loader2 className="h-6 w-6 animate-spin" />
-      </div>
-    ),
-    ssr: false,
-  },
+  { loading: viewLoading, ssr: false },
 );
 
 const CzerPanel = dynamic(
   () => import("@/components/admin/czer-panel").then((m) => m.CzerPanel),
-  {
-    loading: () => (
-      <div className="min-h-screen flex items-center justify-center text-muted-foreground">
-        <Loader2 className="h-6 w-6 animate-spin" />
-      </div>
-    ),
-    ssr: false,
-  },
+  { loading: viewLoading, ssr: false },
 );
+
+const ShowcaseView = dynamic(() => import("@/components/showcase/showcase-view").then((m) => m.ShowcaseView), { loading: viewLoading });
+const ProjectDetail = dynamic(() => import("@/components/showcase/project-detail").then((m) => m.ProjectDetail), { loading: viewLoading });
+const ProductsView = dynamic(() => import("@/components/products/products-view").then((m) => m.ProductsView), { loading: viewLoading });
+const ProductDetail = dynamic(() => import("@/components/products/products-view").then((m) => m.ProductDetail), { loading: viewLoading });
+const BlogView = dynamic(() => import("@/components/blog/blog-view").then((m) => m.BlogView), { loading: viewLoading });
+const BlogDetail = dynamic(() => import("@/components/blog/blog-view").then((m) => m.BlogDetail), { loading: viewLoading });
+const FaqView = dynamic(() => import("@/components/site/faq-view").then((m) => m.FaqView), { loading: viewLoading });
+const ShopView = dynamic(() => import("@/components/site/shop-view").then((m) => m.ShopView), { loading: viewLoading });
+const AnnouncementsView = dynamic(() => import("@/components/site/announcements-view").then((m) => m.AnnouncementsView), { loading: viewLoading });
+const ApiKeysView = dynamic(() => import("@/components/site/api-keys-view").then((m) => m.ApiKeysView), { loading: viewLoading });
+const DocsView = dynamic(() => import("@/components/site/docs-view").then((m) => m.DocsView), { loading: viewLoading });
+const SubscriptionsView = dynamic(() => import("@/components/site/subscriptions-view").then((m) => m.SubscriptionsView), { loading: viewLoading });
+const CustomerChatView = dynamic(() => import("@/components/site/customer-chat-view").then((m) => m.CustomerChatView), { loading: viewLoading });
+const StaticPage = dynamic(() => import("@/components/site/static-page").then((m) => m.StaticPage), { loading: viewLoading });
+const FloatingAnnouncementsButton = dynamic(() => import("@/components/site/floating-announcements-button").then((m) => m.FloatingAnnouncementsButton), { ssr: false });
+const BloomCommandsShowcase = dynamic(() => import("@/components/site/bloom-commands-showcase").then((m) => m.BloomCommandsShowcase), { loading: viewLoading });
+const BloomBotStatus = dynamic(() => import("@/components/site/bloom-bot-status").then((m) => m.BloomBotStatus), { loading: viewLoading });
+const BloomHomeView = dynamic(() => import("@/components/site/bloom-home-view").then((m) => m.BloomHomeView), { loading: viewLoading });
+const BloomDocsView = dynamic(() => import("@/components/site/bloom-docs-view").then((m) => m.BloomDocsView), { loading: viewLoading });
 
 export interface PageData {
   projects: SerializedProject[];
@@ -102,15 +95,10 @@ export function PageClient({ data, brandId = "fubrio" }: { data: PageData; brand
   useEffect(() => {
     document.title = brand.metaTitle;
   }, [brand]);
+
   const route = useHashRoute();
   const [mounted, setMounted] = useState(false);
   const [searchOpen, setSearchOpen] = useState(false);
-  const [detailData, setDetailData] = useState<{
-    project?: SerializedProject;
-    related?: SerializedProject[];
-    product?: SerializedProduct;
-    post?: SerializedPost;
-  }>({});
 
   useEffect(() => {
     requestAnimationFrame(() => setMounted(true));
@@ -162,13 +150,16 @@ export function PageClient({ data, brandId = "fubrio" }: { data: PageData; brand
   if (effectiveBase === "showcase" && effectiveSub) {
     const project = data.projects.find((p) => p.slug === effectiveSub);
     if (!project) return <NotFoundShell onBack={() => navigate("#showcase")} entity="project" brand={brand} />;
-    const related = data.projects.filter((p) => p.slug !== project.slug && (p.category?.id === project.category?.id || p.featured)).slice(0, 3);
+    const related = data.projects
+      .filter((p) => p.slug !== project.slug && (p.category?.id === project.category?.id || p.featured))
+      .slice(0, 3);
     return (
       <Chrome searchOpen={searchOpen} setSearchOpen={setSearchOpen} footerColumns={data.footerColumns} brand={brand}>
         <ProjectDetail project={project} related={related} />
       </Chrome>
     );
   }
+
   if (effectiveBase === "products" && effectiveSub) {
     const product = data.products.find((p) => p.slug === effectiveSub);
     if (!product) return <NotFoundShell onBack={() => navigate("#products")} entity="product" brand={brand} />;
@@ -178,6 +169,7 @@ export function PageClient({ data, brandId = "fubrio" }: { data: PageData; brand
       </Chrome>
     );
   }
+
   if (effectiveBase === "blog" && effectiveSub) {
     const post = data.posts.find((p) => p.slug === effectiveSub);
     if (!post) return <NotFoundShell onBack={() => navigate("#blog")} entity="article" brand={brand} />;
@@ -188,11 +180,22 @@ export function PageClient({ data, brandId = "fubrio" }: { data: PageData; brand
     );
   }
 
-  if (mounted && effectiveBase !== "home" && effectiveBase !== "showcase" && effectiveBase !== "products" && effectiveBase !== "blog" && effectiveBase !== "contact" && effectiveBase !== "faq" && effectiveBase !== "shop" && effectiveBase !== "announcements" && effectiveBase !== "api-keys" && effectiveBase !== "docs" && effectiveBase !== "chat" && effectiveBase !== "subscriptions" && effectiveBase !== "commands") {
+  const reserved = new Set([
+    "home", "showcase", "products", "blog", "contact", "faq", "shop",
+    "announcements", "api-keys", "docs", "chat", "subscriptions", "commands",
+  ]);
+
+  if (mounted && !reserved.has(effectiveBase)) {
     const cmsPage = data.pages.find((p) => p.slug === effectiveBase);
     if (cmsPage) {
       return (
-        <Chrome searchOpen={searchOpen} setSearchOpen={setSearchOpen} footerColumns={data.footerColumns} showFloatingAnnouncements={false} brand={brand}>
+        <Chrome
+          searchOpen={searchOpen}
+          setSearchOpen={setSearchOpen}
+          footerColumns={data.footerColumns}
+          showFloatingAnnouncements={false}
+          brand={brand}
+        >
           <StaticPage page={cmsPage} />
         </Chrome>
       );
@@ -208,38 +211,45 @@ export function PageClient({ data, brandId = "fubrio" }: { data: PageData; brand
       {effectiveBase === "shop" && <ShopView items={data.shopItems} settings={data.settings} />}
       {effectiveBase === "announcements" && <AnnouncementsView />}
       {effectiveBase === "api-keys" && <ApiKeysView />}
-      {effectiveBase === "docs" && (brand.isBloom
-        ? <BloomDocsView botInviteUrl={brand.botInviteUrl} discordUrl={brand.discordUrl} />
-        : <DocsView />)}
+      {effectiveBase === "docs" && (brand.isBloom ? (
+        <BloomDocsView botInviteUrl={brand.botInviteUrl} discordUrl={brand.discordUrl} />
+      ) : (
+        <DocsView />
+      ))}
       {effectiveBase === "chat" && <CustomerChatView />}
       {effectiveBase === "subscriptions" && !brand.isBloom && <SubscriptionsView />}
       {effectiveBase === "subscriptions" && brand.isBloom && (
-        <div className="pt-4 pb-24 min-h-screen">
-          <div className="mx-auto max-w-3xl px-4 text-center pt-20">
-            <div className="text-sm text-muted-foreground">Bloom is completely free - no subscriptions needed.</div>
-            <Button onClick={() => navigate("#home")} variant="outline" className="rounded-full mt-4">Back to home</Button>
-          </div>
+        <div className="mx-auto max-w-[84rem] px-4 py-24 sm:px-6 lg:px-8">
+          <p className="text-sm text-muted-foreground">Bloom is completely free — no subscriptions needed.</p>
+          <button onClick={() => navigate("#home")} className="btn-line mt-4">
+            Back to home
+          </button>
         </div>
       )}
       {effectiveBase === "commands" && brand.isBloom && (
-        <div className="pt-4 pb-24 min-h-screen">
-          <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-            <button onClick={() => navigate("#home")} className="text-sm text-muted-foreground hover:text-foreground inline-flex items-center gap-1.5 mb-6">
-              <ArrowLeft className="h-3.5 w-3.5" /> Back to home
+        <div className="py-12">
+          <div className="mx-auto max-w-[84rem] px-4 sm:px-6 lg:px-8">
+            <button
+              onClick={() => navigate("#home")}
+              className="mb-6 inline-flex items-center gap-1.5 font-mono text-[11px] uppercase tracking-[0.1em] text-muted-foreground hover:text-foreground"
+            >
+              <ArrowLeft className="h-3.5 w-3.5" /> Back
             </button>
-            <div className="text-xs uppercase tracking-wider text-[var(--fubrio-accent)] font-semibold">Commands</div>
-            <h1 className="display-heading mt-2 text-4xl sm:text-5xl">Browse all commands</h1>
-            <p className="mt-2 text-muted-foreground">Explore every Bloom command across 21 categories.</p>
+            <div className="eyebrow">Commands</div>
+            <h1 className="display-heading mt-2 text-[2.6rem]">Everything Bloom can do</h1>
+            <p className="mt-2 max-w-xl text-sm text-muted-foreground">
+              Every command across 21 categories, with the permission each one needs.
+            </p>
             <div className="mt-6"><BloomBotStatus fallback={brand.botStatsFallback} /></div>
             <div className="mt-8"><BloomCommandsShowcase /></div>
           </div>
         </div>
       )}
       {effectiveBase === "commands" && !brand.isBloom && (
-        <div className="pt-4 pb-24 min-h-screen">
-          <div className="mx-auto max-w-3xl px-4 text-center pt-20">
-            <div className="text-sm text-muted-foreground">Commands page is available on the Bloom website at bloom.fubrio.in/#commands</div>
-          </div>
+        <div className="mx-auto max-w-xl px-4 py-24 text-center">
+          <p className="text-sm text-muted-foreground">
+            The command reference lives on the Bloom site — bloom.fubrio.in/#commands
+          </p>
         </div>
       )}
       {brand.isBloom ? (
@@ -264,8 +274,8 @@ function Chrome({
   brand: BrandConfig;
 }) {
   return (
-    <div className="min-h-screen flex flex-col bg-background">
-      <div className="sticky top-0 z-50">
+    <div className="relative z-[1] flex min-h-screen flex-col bg-background">
+      <div className="sticky top-0 z-40">
         <DonationBanner />
         <Navbar onOpenSearch={() => setSearchOpen(true)} brand={brand} />
       </div>
@@ -282,27 +292,33 @@ function HomeView({ data, brand }: { data: PageData; brand: BrandConfig }) {
     <>
       <Hero projects={data.projects} metrics={data.metrics} />
       <FeaturedShowcase projects={data.projects} />
-      <section className="px-4 py-12 sm:px-6 lg:px-8">
-        <div className="mx-auto flex max-w-7xl flex-col gap-6 overflow-hidden rounded-3xl border border-border bg-card p-7 sm:flex-row sm:items-center sm:justify-between sm:p-10">
-          <div className="max-w-2xl">
-            <div className="text-xs font-semibold uppercase tracking-[0.18em] text-[var(--fubrio-accent)]">Now open</div>
-            <h2 className="display-heading mt-3 text-3xl sm:text-4xl">FubFindz Store</h2>
-            <p className="mt-3 text-sm leading-6 text-muted-foreground sm:text-base">Discover products and explore current offers on Amazon India through FubFindz, by Fubrio.</p>
+
+      <section className="border-b border-border py-6">
+        <div className="mx-auto max-w-[84rem] px-4 sm:px-6 lg:px-8">
+          <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+            <div className="flex flex-col gap-1 sm:flex-row sm:items-baseline sm:gap-3">
+              <span className="eyebrow">Also running</span>
+              <span className="text-sm">
+                <span className="font-medium">FubFindz</span>{" "}
+                <span className="text-muted-foreground">— a storefront for Amazon India finds.</span>
+              </span>
+            </div>
+            <a href="https://fubfindz.fubrio.in" className="link-arrow shrink-0 text-foreground">
+              Open the store <ArrowUpRight className="h-3.5 w-3.5" />
+            </a>
           </div>
-          <a href="https://fubfindz.fubrio.in" className="inline-flex shrink-0 items-center justify-center rounded-full bg-foreground px-6 py-3 text-sm font-semibold text-background transition hover:opacity-90">
-            Open FubFindz Store <span aria-hidden="true" className="ml-2">↗</span>
-          </a>
         </div>
       </section>
+
       <Ecosystem />
       <ServicesGrid services={data.services} categories={data.categories} />
-      <SponsorsMarquee sponsors={data.sponsors} />
-      <PartnersGrid partners={data.partners} />
       <Community events={data.events} />
+      <PartnersGrid partners={data.partners} />
+      <SponsorsMarquee sponsors={data.sponsors} />
       <TeamSection members={data.teamMembers} />
       <Testimonials testimonials={data.testimonials} />
-      <BlogPreview posts={data.posts} />
       <DonatorsSection donators={data.donators} />
+      <BlogPreview posts={data.posts} />
       <ContactCTA settings={data.settings} />
     </>
   );
@@ -310,19 +326,21 @@ function HomeView({ data, brand }: { data: PageData; brand: BrandConfig }) {
 
 function NotFoundShell({ onBack, entity, brand }: { onBack: () => void; entity: string; brand: BrandConfig }) {
   return (
-    <div className="min-h-screen flex flex-col">
+    <div className="relative z-[1] flex min-h-screen flex-col bg-background">
       <Navbar onOpenSearch={() => {}} brand={brand} />
-      <main className="flex-1 flex items-center justify-center pt-32 pb-24">
-        <div className="text-center">
-          <div className="font-display text-7xl font-bold text-[var(--fubrio-accent)]">404</div>
-          <h1 className="mt-4 font-display text-2xl font-semibold">{entity[0].toUpperCase() + entity.slice(1)} not found</h1>
-          <p className="mt-2 text-muted-foreground">This content may have been removed or unpublished.</p>
-          <button onClick={onBack} className="mt-6 inline-flex items-center gap-1.5 rounded-full border border-border px-4 py-2 text-sm hover:bg-accent">
+      <main className="flex flex-1 items-center justify-center px-4 py-24">
+        <div className="max-w-sm">
+          <div className="font-mono text-[11px] uppercase tracking-[0.12em] text-muted-foreground">Error 404</div>
+          <h1 className="display-heading mt-2 text-[2.6rem] capitalize">{entity} not found</h1>
+          <p className="mt-3 text-sm leading-relaxed text-muted-foreground">
+            This page may have been unpublished or renamed since the link was shared.
+          </p>
+          <button onClick={onBack} className="btn-line mt-6">
             Go back
           </button>
         </div>
       </main>
-      <Footer columns={[]} />
+      <Footer columns={[]} brand={brand} />
     </div>
   );
 }

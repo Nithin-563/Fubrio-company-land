@@ -1,13 +1,12 @@
 "use client";
 
-import { useState } from "react";
-import { signIn } from "next-auth/react";
-import { Loader2, Lock, ShieldCheck, ArrowLeft, KeyRound, User } from "lucide-react";
+import { useEffect, useState } from "react";
+import { navigate } from "@/lib/router";
+import { ArrowLeft, KeyRound, Loader2, Lock } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Logo } from "@/components/shared/logo";
-import { navigate } from "@/lib/router";
+import { signIn } from "next-auth/react";
 import { toast } from "sonner";
 
 export function CzerPanel({ onClose }: { onClose: () => void }) {
@@ -18,149 +17,124 @@ export function CzerPanel({ onClose }: { onClose: () => void }) {
 
   const submit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (mode === "master") {
-      if (!code) return;
-      setLoading(true);
-      try {
-        const res = await signIn("credentials", {
-          email: "czer@fubrio.in",
-          password: `czer-${code}`,
-          redirect: false,
-        });
-        if (!res || res.error) {
-          toast.error(`Authentication failed: ${res?.error || "Unknown error"}`);
-          return;
-        }
-        toast.success("Super Admin access granted");
-        setTimeout(() => navigate("#admin/dashboard"), 500);
-      } catch (err) {
-        toast.error(`Network error: ${err instanceof Error ? err.message : "Unknown"}`);
-      } finally {
-        setLoading(false);
-      }
-    } else {
-      if (!email || !code) {
-        toast.error("Both email and Czer code are required");
+    if (mode === "employee" && !email) {
+      toast.error("Enter your email address");
+      return;
+    }
+    if (!/^\d{6}$/.test(code)) {
+      toast.error("The access code is six digits");
+      return;
+    }
+
+    setLoading(true);
+    try {
+      const res = await signIn("credentials", {
+        email: mode === "master" ? "czer@fubrio.in" : email.toLowerCase().trim(),
+        password: `czer-${code}`,
+        redirect: false,
+      });
+      if (!res || res.error) {
+        toast.error(mode === "master" ? "That code was rejected" : "Email and code do not match");
         return;
       }
-      if (!/^\d{6}$/.test(code)) {
-        toast.error("Czer code must be exactly 6 digits");
-        return;
-      }
-      setLoading(true);
-      try {
-        const res = await signIn("credentials", {
-          email: email.toLowerCase().trim(),
-          password: `czer-${code}`,
-          redirect: false,
-        });
-        if (!res || res.error) {
-          toast.error(`Authentication failed: ${res?.error || "Invalid email or code"}`);
-          return;
-        }
-        toast.success("Signed in");
-        setTimeout(() => navigate("#admin/dashboard"), 500);
-      } catch (err) {
-        toast.error(`Network error: ${err instanceof Error ? err.message : "Unknown"}`);
-      } finally {
-        setLoading(false);
-      }
+      toast.success(mode === "master" ? "Super admin access granted" : "Signed in");
+      setTimeout(() => navigate("#admin/dashboard"), 400);
+    } catch {
+      toast.error("Network error. Try again.");
+    } finally {
+      setLoading(false);
     }
   };
 
   return (
-    <div className="min-h-screen flex flex-col items-center justify-center px-4 py-12 fubrio-aurora">
-      <div className="absolute inset-0 fubrio-grid-bg opacity-30" aria-hidden />
-      <div className="relative w-full max-w-md">
-        <button onClick={onClose} className="text-sm text-muted-foreground hover:text-foreground inline-flex items-center gap-1.5 mb-6">
-          <ArrowLeft className="h-3.5 w-3.5" /> Back
+    <div className="flex min-h-screen flex-col justify-center border-t border-border px-4 py-16">
+      <div className="mx-auto w-full max-w-sm">
+        <button onClick={onClose} className="link-arrow mb-10 text-muted-foreground">
+          <ArrowLeft className="h-3.5 w-3.5" /> Back to site
         </button>
 
-        <div className="rounded-3xl border border-border bg-card/80 backdrop-blur-xl p-8 shadow-xl glass">
-          <div className="flex items-center gap-2 mb-6">
-            <Logo />
-          </div>
+        <div className="flex items-center gap-2">
+          <span className="h-1.5 w-1.5 bg-[var(--fubrio-accent)]" aria-hidden />
+          <span className="eyebrow">Restricted</span>
+        </div>
 
-          <div className="flex items-center gap-3 mb-6">
-            <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-[var(--fubrio-accent-soft)] border border-[var(--fubrio-accent)]/30">
-              <KeyRound className="h-4 w-4 text-[var(--fubrio-accent)]" />
-            </div>
-            <div>
-              <h1 className="font-display text-xl font-semibold">Czer Access</h1>
-              <p className="text-xs text-muted-foreground">Restricted area</p>
-            </div>
-          </div>
+        <h1 className="display-heading mt-3 text-[2.25rem] leading-none">Czer access</h1>
+        <p className="mt-3 text-[0.9375rem] leading-relaxed text-muted-foreground">
+          Two ways in: the master code for full control, or the six-digit code your admin issued
+          to your email.
+        </p>
 
-          <div className="mb-5 grid grid-cols-2 gap-1.5 p-1 rounded-full glass-input">
-            <button
-              type="button"
-              onClick={() => setMode("master")}
-              className={`rounded-full px-3 py-1.5 text-xs font-medium transition-colors inline-flex items-center justify-center gap-1.5 ${
-                mode === "master"
-                  ? "bg-foreground text-background"
-                  : "text-muted-foreground hover:text-foreground"
-              }`}
-            >
-              <ShieldCheck className="h-3.5 w-3.5" />
-              Super Admin
-            </button>
-            <button
-              type="button"
-              onClick={() => setMode("employee")}
-              className={`rounded-full px-3 py-1.5 text-xs font-medium transition-colors inline-flex items-center justify-center gap-1.5 ${
-                mode === "employee"
-                  ? "bg-foreground text-background"
-                  : "text-muted-foreground hover:text-foreground"
-              }`}
-            >
-              <User className="h-3.5 w-3.5" />
-              Employee
-            </button>
-          </div>
+        <div className="mt-8 grid grid-cols-2 border border-border">
+          <button
+            type="button"
+            onClick={() => setMode("master")}
+            className={`py-2 text-[11px] uppercase tracking-[0.14em] transition-colors ${
+              mode === "master"
+                ? "bg-foreground text-background"
+                : "text-muted-foreground hover:text-foreground"
+            }`}
+          >
+            Master
+          </button>
+          <button
+            type="button"
+            onClick={() => setMode("employee")}
+            className={`border-l border-border py-2 text-[11px] uppercase tracking-[0.14em] transition-colors ${
+              mode === "employee"
+                ? "bg-foreground text-background"
+                : "text-muted-foreground hover:text-foreground"
+            }`}
+          >
+            Employee
+          </button>
+        </div>
 
-          <form onSubmit={submit} className="space-y-4">
-            {mode === "employee" && (
-              <div className="space-y-1.5">
-                <Label className="text-xs font-medium text-muted-foreground">Your email address</Label>
-                <Input
-                  type="email"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  required
-                  autoFocus
-                  className="bg-background/50"
-                  placeholder="you@gmail.com"
-                />
-              </div>
-            )}
+        <form onSubmit={submit} className="mt-6 space-y-4">
+          {mode === "employee" && (
             <div className="space-y-1.5">
-              <Label className="text-xs font-medium text-muted-foreground">
-                {mode === "master" ? "Master access code" : "Your Czer code"}
+              <Label htmlFor="czer-email" className="text-[11px] uppercase tracking-[0.14em] text-muted-foreground">
+                Email
               </Label>
               <Input
-                type="password"
-                value={code}
-                onChange={(e) => setCode(e.target.value.replace(/\D/g, "").slice(0, 6))}
-                required
-                autoFocus={mode === "master"}
-                inputMode="numeric"
-                pattern="\d{6}"
-                className="bg-background/50 tracking-[0.3em] glass-input"
-                placeholder="••••••"
+                id="czer-email"
+                type="email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                autoComplete="email"
+                placeholder="you@fubrio.in"
               />
             </div>
+          )}
 
-            <Button type="submit" disabled={loading} className="w-full rounded-full bg-foreground text-background hover:bg-foreground/90">
-              {loading ? <Loader2 className="h-4 w-4 animate-spin mr-2" /> : <Lock className="h-4 w-4 mr-2" />}
-              Verify
-            </Button>
+          <div className="space-y-1.5">
+            <Label htmlFor="czer-code" className="text-[11px] uppercase tracking-[0.14em] text-muted-foreground">
+              {mode === "master" ? "Master code" : "Your code"}
+            </Label>
+            <Input
+              id="czer-code"
+              type="password"
+              value={code}
+              onChange={(e) => setCode(e.target.value.replace(/\D/g, "").slice(0, 6))}
+              inputMode="numeric"
+              autoComplete="one-time-code"
+              placeholder="••••••"
+              className="font-mono tracking-[0.4em]"
+            />
+          </div>
 
-            <p className="text-[11px] text-muted-foreground text-center">
-              {mode === "master"
-                ? "Entering the correct master code grants full Super Admin access."
-                : "Use the 6-digit code your admin assigned to you. Your access is limited to what they granted."}
-            </p>
-          </form>
+          <Button type="submit" disabled={loading} className="w-full">
+            {loading ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Lock className="mr-2 h-4 w-4" />}
+            Verify
+          </Button>
+        </form>
+
+        <div className="mt-8 flex items-start gap-2 border-t border-border pt-4 text-[12px] leading-relaxed text-muted-foreground">
+          <KeyRound className="mt-0.5 h-3.5 w-3.5 flex-shrink-0" />
+          <span>
+            {mode === "master"
+              ? "The master code grants full super admin access. Treat it like a root password."
+              : "Employee codes are limited to the sections your admin granted. Ask them for a reset if yours expired."}
+          </span>
         </div>
       </div>
     </div>

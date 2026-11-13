@@ -169,7 +169,7 @@ export function CustomerChatView() {
       <div className="pt-4 pb-24 min-h-screen">
         <div className="mx-auto max-w-3xl px-4 sm:px-6 lg:px-8">
           <Skeleton className="h-12 w-48 mb-4" />
-          <Skeleton className="h-96 rounded-xl" />
+          <Skeleton className="h-96 rounded-sm" />
         </div>
       </div>
     );
@@ -189,7 +189,7 @@ export function CustomerChatView() {
           <h1 className="display-heading mt-2 text-3xl">Chat not available</h1>
           <p className="mt-2 text-muted-foreground">{error ?? "Unknown error."}</p>
           <div className="mt-6">
-            <Button onClick={() => navigate("#contact")} variant="outline" className="rounded-full">
+            <Button onClick={() => navigate("#contact")} variant="outline" className="rounded-none">
               Go to contact form
             </Button>
           </div>
@@ -226,12 +226,12 @@ export function CustomerChatView() {
               <User className="h-3 w-3" /> {chat.customerContactMethod}
             </span>
           )}
-          <span className="badge inline-flex items-center gap-1 rounded-full border border-border px-2 py-0.5 text-[10px] uppercase">
+          <span className="badge inline-flex items-center gap-1 rounded-none border border-border px-2 py-0.5 text-[10px] uppercase">
             {chat.status}
           </span>
         </div>
 
-        <div className="mt-6 rounded-2xl border border-border bg-card overflow-hidden flex flex-col h-[60vh] min-h-[400px]">
+        <div className="mt-6 rounded-none border border-border bg-card overflow-hidden flex flex-col h-[60vh] min-h-[400px]">
           <div className="flex-1 overflow-y-auto p-4 space-y-2 bg-secondary/20">
             {messages.length === 0 ? (
               <div className="text-center text-sm text-muted-foreground py-12">
@@ -245,7 +245,7 @@ export function CustomerChatView() {
                 >
                   <div
                     className={cn(
-                      "max-w-[75%] rounded-2xl px-3 py-2",
+                      "max-w-[75%] rounded-none px-3 py-2",
                       m.senderType === "customer"
                         ? "bg-[var(--fubrio-accent)] text-[var(--fubrio-accent-foreground)] rounded-br-sm"
                         : "bg-card border border-border rounded-bl-sm",
@@ -292,7 +292,7 @@ export function CustomerChatView() {
                   size="icon"
                   onClick={send}
                   disabled={sending || !draft.trim()}
-                  className="rounded-full bg-foreground text-background hover:bg-foreground/90"
+                  className="rounded-none bg-foreground text-background hover:bg-foreground/90"
                 >
                   {sending ? <Loader2 className="h-4 w-4 animate-spin" /> : <Send className="h-4 w-4" />}
                 </Button>

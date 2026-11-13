@@ -78,8 +78,8 @@ export function SearchOverlay({ open, onOpenChange }: { open: boolean; onOpenCha
 
   return (
     <div className="fixed inset-0 z-[100] flex items-start justify-center p-4 sm:p-8 animate-fade-in">
-      <div className="absolute inset-0 bg-background/80 backdrop-blur-sm" onClick={() => onOpenChange(false)} />
-      <div className="relative w-full max-w-2xl mt-16 sm:mt-24 rounded-2xl glass-strong shadow-2xl overflow-hidden animate-scale-in">
+      <div className="absolute inset-0 bg-foreground/35" onClick={() => onOpenChange(false)} />
+      <div className="relative mt-16 w-full max-w-2xl overflow-hidden border border-border bg-background shadow-[8px_8px_0_0_rgba(0,0,0,0.14)] animate-fade-in sm:mt-24">
         <div className="flex items-center gap-3 px-4 py-3 border-b border-border">
           <Search className="h-4 w-4 text-muted-foreground" />
           <Input
@@ -89,10 +89,10 @@ export function SearchOverlay({ open, onOpenChange }: { open: boolean; onOpenCha
             placeholder="Search projects, products, posts…"
             className="border-0 bg-transparent px-0 py-0 h-auto focus-visible:ring-0 text-base"
           />
-          <kbd className="hidden sm:inline-flex items-center gap-1 rounded border border-border px-1.5 py-0.5 text-xs text-muted-foreground">
+          <kbd className="hidden items-center gap-1 border border-border px-1.5 py-0.5 font-mono text-[10px] uppercase text-muted-foreground sm:inline-flex">
             ESC
           </kbd>
-          <button onClick={() => onOpenChange(false)} className="rounded-md p-1 hover:bg-accent" aria-label="Close">
+          <button onClick={() => onOpenChange(false)} className="p-1 text-muted-foreground hover:text-foreground" aria-label="Close">
             <X className="h-4 w-4" />
           </button>
         </div>
@@ -156,7 +156,7 @@ export function SearchOverlay({ open, onOpenChange }: { open: boolean; onOpenCha
 function ResultGroup({ title, icon, children }: { title: string; icon?: React.ReactNode; children: React.ReactNode }) {
   return (
     <div className="mb-2">
-      <div className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+      <div className="flex items-center gap-1.5 px-3 pb-1 pt-2 font-mono text-[10px] uppercase tracking-[0.1em] text-muted-foreground">
         {icon}
         {title}
       </div>
@@ -167,7 +167,7 @@ function ResultGroup({ title, icon, children }: { title: string; icon?: React.Re
 
 function ResultRow({ title, desc, onClick }: { title: string; desc?: string | null; onClick: () => void }) {
   return (
-    <button onClick={onClick} className="group flex w-full items-center justify-between gap-3 rounded-lg px-3 py-2.5 hover:bg-accent transition-colors text-left">
+    <button onClick={onClick} className="group flex w-full items-center justify-between gap-3 px-3 py-2.5 text-left transition-colors hover:bg-accent/60">
       <div className="min-w-0">
         <div className="text-sm font-medium truncate">{title}</div>
         {desc && <div className="text-xs text-muted-foreground truncate mt-0.5">{desc}</div>}

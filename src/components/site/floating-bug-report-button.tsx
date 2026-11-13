@@ -16,7 +16,7 @@ import { cn } from "@/lib/utils";
 
 
 const KNOWN_PROJECTS = [
-  "Wisee AI 1.0 API",
+  "AI API",
   "Fubrio Ads API",
   "Fubrio API Keys",
   "Fubrio Announcements Webhook",

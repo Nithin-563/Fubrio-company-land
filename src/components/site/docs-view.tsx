@@ -16,7 +16,7 @@ const SECTIONS = [
   { id: "auth", label: "Authentication", icon: Shield },
   { id: "rate-limits", label: "Rate Limits", icon: Zap },
   { id: "announcements", label: "Announcements API", icon: Bell },
-  { id: "ai", label: "Wisee AI 1.0 API", icon: Sparkles },
+  { id: "ai", label: "AI API", icon: Sparkles },
   { id: "ads", label: "Fubrio Ads API", icon: Megaphone },
   { id: "errors", label: "Error Handling", icon: AlertTriangle },
   { id: "examples", label: "Examples", icon: Code2 },
@@ -27,12 +27,12 @@ type SectionId = (typeof SECTIONS)[number]["id"];
 function CodeBlock({ code, lang = "bash" }: { code: string; lang?: string }) {
   const [copied, setCopied] = useState(false);
   return (
-    <div className="relative rounded-lg bg-secondary border border-border">
+    <div className="relative rounded-sm bg-secondary border border-border">
       <div className="absolute top-2 right-2">
         <Button
           size="icon"
           variant="ghost"
-          className="rounded-full h-7 w-7"
+          className="rounded-none h-7 w-7"
           onClick={() => {
             navigator.clipboard.writeText(code);
             setCopied(true);
@@ -84,13 +84,13 @@ export function DocsView() {
         </div>
         <h1 className="display-heading mt-2 text-4xl sm:text-5xl">Fubrio API Docs</h1>
         <p className="mt-2 text-muted-foreground max-w-2xl">
-          Complete reference for Fubrio&apos;s public APIs. Wire announcements into your app, call the Wisee AI 1.0 chat
+          Complete reference for Fubrio&apos;s public APIs. Wire announcements into your app, call the Fubrio AI chat
           endpoint, and more.
         </p>
 
         <div className="mt-8 grid grid-cols-1 lg:grid-cols-4 gap-8">
           <aside className="lg:col-span-1 lg:sticky lg:top-20 lg:self-start">
-            <div className="rounded-2xl border border-border bg-card p-3">
+            <div className="rounded-none border border-border bg-card p-3">
               <div className="text-[10px] uppercase tracking-wider text-muted-foreground font-semibold px-2 pb-2">
                 On this page
               </div>
@@ -113,7 +113,7 @@ export function DocsView() {
                 ))}
               </nav>
               <div className="mt-3 pt-3 border-t border-border">
-                <Button onClick={() => navigate("#api-keys")} size="sm" className="w-full rounded-full bg-foreground text-background hover:bg-foreground/90">
+                <Button onClick={() => navigate("#api-keys")} size="sm" className="w-full rounded-none bg-foreground text-background hover:bg-foreground/90">
                   <Key className="h-3.5 w-3.5 mr-1.5" /> Manage API Keys
                 </Button>
               </div>
@@ -145,7 +145,7 @@ export function DocsView() {
               <P>
                 Fubrio exists to build useful, beautiful, and accessible digital products. The platform
                 brings together a public showcase of projects, a digital shop, an announcements system, an
-                AI assistant (Wisee AI 1.0), a developer-grade public API, and a community hub. Everything
+                AI assistant (Fubrio AI), a developer-grade public API, and a community hub. Everything
                 is built in the open - the website itself is the product.
               </P>
 
@@ -153,7 +153,7 @@ export function DocsView() {
               <ul className="space-y-1 mb-4">
                 <Li><strong>Software products</strong> - SaaS apps, Discord bots, indie games, and AI tools, available through the Fubrio Shop.</Li>
                 <Li><strong>Services</strong> - custom development, AI integrations, and creative technology work for clients.</Li>
-                <Li><strong>Public APIs</strong> - Announcements webhooks, Wisee AI 1.0 chat completion, and Fubrio Ads for publishers.</Li>
+                <Li><strong>Public APIs</strong> - Announcements webhooks, Fubrio AI chat completion, and Fubrio Ads for publishers.</Li>
                 <Li><strong>Community</strong> - an active Discord where the team and community discuss products, ideas, and feedback.</Li>
               </ul>
 
@@ -197,7 +197,7 @@ export function DocsView() {
                 Fubrio exposes a small but growing set of public APIs. Each API requires an API key that you
                 create from the <button onClick={() => navigate("#api-keys")} className="text-foreground underline hover:no-underline">API Keys</button>{" "}
                 page. Keys are scoped to a single API type - a key for the Announcements API cannot call the
-                Wisee AI 1.0 endpoint, and vice versa.
+                Fubrio AI endpoint, and vice versa.
               </P>
               <P>
                 The base URL for all production API calls is <code className="font-mono bg-secondary px-1.5 py-0.5 rounded text-xs">https://fubrio.in</code>.
@@ -207,10 +207,10 @@ export function DocsView() {
               <H3>Available APIs</H3>
               <ul className="space-y-1 mb-4">
                 <Li><strong>Announcements</strong> - receive a webhook POST every time Fubrio publishes a new announcement.</Li>
-                <Li><strong>Wisee AI 1.0</strong> - chat completion endpoint. Submit a list of messages, get a response back.</Li>
+                <Li><strong>Fubrio AI</strong> - chat completion endpoint. Submit a list of messages, get a response back.</Li>
                 <Li><strong>Fubrio Ads</strong> - embed ad units on your site. Get paid per impression. Powered by the highest-paying ad provider we&apos;ve integrated.</Li>
               </ul>
-              <div className="rounded-xl border border-border bg-secondary/30 p-4 my-4">
+              <div className="rounded-sm border border-border bg-secondary/30 p-4 my-4">
                 <div className="text-xs text-muted-foreground">
                   More API types are coming in future releases (e.g. cloud storage, payment, search). All
                   future types will use the same API-key mechanism.
@@ -251,7 +251,7 @@ Content-Type: application/json`} />
               </P>
               <ul className="space-y-1 mb-4">
                 <Li><strong>API key creation</strong> - max <code className="font-mono bg-secondary px-1.5 py-0.5 rounded text-xs">3</code> keys per user per UTC day.</Li>
-                <Li><strong>Wisee AI 1.0 calls</strong> - max <code className="font-mono bg-secondary px-1.5 py-0.5 rounded text-xs">60</code> calls per key per minute.</Li>
+                <Li><strong>Fubrio AI calls</strong> - max <code className="font-mono bg-secondary px-1.5 py-0.5 rounded text-xs">60</code> calls per key per minute.</Li>
                 <Li><strong>Announcement webhook deliveries</strong> - no rate limit (delivered as they happen).</Li>
               </ul>
               <P>
@@ -377,10 +377,13 @@ ngrok http 3000
             </section>
 
             <section id="ai" className="scroll-mt-24">
-              <H2>Wisee AI 1.0 API</H2>
+              <H2>AI API</H2>
               <P>
-                The Wisee AI 1.0 endpoint is a chat completion API. Submit a list of messages, get a response
-                back. The model is <strong>Wisee AI 1.0</strong>, built by Fubrio.
+                A chat completion endpoint. Send a list of messages and get a reply. The provider,
+                base URL and model are configured by the site owner in{" "}
+                <strong>Admin → Settings → AI API</strong>, so any OpenAI-compatible endpoint
+                (OpenAI, OpenRouter, Groq, Together, vLLM, Ollama), Gemini or Anthropic can sit
+                behind the same URL.
               </P>
 
               <H3>Endpoint</H3>
@@ -396,18 +399,23 @@ Content-Type: application/json`} />
     { "role": "user", "content": "What's the capital of France?" }
   ],
   "temperature": 0.7,
-  "maxTokens": 1024
+  "maxTokens": 1024,
+  "model": "gpt-4o-mini",
+  "system": "Answer in one paragraph."
 }`} />
               <ul className="space-y-1 mb-4">
                 <Li><code className="font-mono bg-secondary px-1.5 py-0.5 rounded text-xs">messages</code> (required) - array of <code className="font-mono bg-secondary px-1.5 py-0.5 rounded text-xs">{`{role, content}`}</code> objects. Roles: <code className="font-mono bg-secondary px-1.5 py-0.5 rounded text-xs">user</code>, <code className="font-mono bg-secondary px-1.5 py-0.5 rounded text-xs">assistant</code>, <code className="font-mono bg-secondary px-1.5 py-0.5 rounded text-xs">system</code>.</Li>
                 <Li><code className="font-mono bg-secondary px-1.5 py-0.5 rounded text-xs">temperature</code> (optional, default 0.7) - 0.0 to 1.0. Higher = more creative.</Li>
                 <Li><code className="font-mono bg-secondary px-1.5 py-0.5 rounded text-xs">maxTokens</code> (optional, default 1024, max 8192) - maximum tokens to generate.</Li>
+                <Li><code className="font-mono bg-secondary px-1.5 py-0.5 rounded text-xs">model</code> (optional) - override the configured model for this call.</Li>
+                <Li><code className="font-mono bg-secondary px-1.5 py-0.5 rounded text-xs">system</code> (optional) - extra system instruction appended to the configured prompt.</Li>
               </ul>
 
               <H3>Response</H3>
               <CodeBlock lang="json" code={`{
   "ok": true,
-  "model": "wisee-ai-1.0",
+  "provider": "openai",
+  "model": "gpt-4o-mini",
   "response": "The capital of France is Paris.",
   "usage": {
     "promptTokens": 12,
@@ -438,7 +446,7 @@ const res = await fetch("https://fubrio.in/api/v1/ai/chat", {
 
 const data = await res.json();
 if (!data.ok) throw new Error(data.error);
-console.log(data.model);     // "wisee-ai-1.0"
+console.log(data.model);     // "fubrio-ai"
 console.log(data.response);  // the generated text
 console.log(data.usage);     // token counts`} />
 
@@ -468,7 +476,7 @@ data = res.json()
 if not data["ok"]:
     raise RuntimeError(data["error"])
 
-print(data["model"])     # wisee-ai-1.0
+print(data["model"])     # fubrio-ai
 print(data["response"])  # the generated text
 print(data["usage"])     # token counts`} />
 
@@ -485,7 +493,7 @@ print(data["usage"])     # token counts`} />
               <H3>System prompt</H3>
               <P>
                 You can prepend a <code className="font-mono bg-secondary px-1.5 py-0.5 rounded text-xs">system</code> message
-                to set context. The model already has a built-in system prompt that identifies it as Wisee AI 1.0
+                to set context. The model already has a built-in system prompt that identifies it as Fubrio AI
                 and refuses to disclose any other model identity.
               </P>
               <CodeBlock lang="json" code={`{
@@ -616,7 +624,7 @@ export function FubrioAd({ format = "banner" }) {
               <CodeBlock lang="json" code={`{
   "ok": false,
   "error": "Human-readable error message",
-  "model": "wisee-ai-1.0"   // present on AI endpoint only
+  "model": "fubrio-ai"   // present on AI endpoint only
 }`} />
               <H3>HTTP status codes</H3>
               <ul className="space-y-1 mb-4">
@@ -626,14 +634,14 @@ export function FubrioAd({ format = "banner" }) {
                 <Li><strong>403</strong> - Wrong key type (e.g. AI key used for announcements or vice versa).</Li>
                 <Li><strong>429</strong> - Rate limit exceeded.</Li>
                 <Li><strong>500</strong> - Internal server error.</Li>
-                <Li><strong>502</strong> - Wisee AI 1.0 upstream service unavailable.</Li>
+                <Li><strong>502</strong> - Fubrio AI upstream service unavailable.</Li>
               </ul>
-              <div className="rounded-xl border border-amber-500/40 bg-amber-500/10 p-4 my-4">
+              <div className="rounded-sm border border-amber-500/40 bg-amber-500/10 p-4 my-4">
                 <div className="flex items-start gap-2">
                   <AlertTriangle className="h-4 w-4 text-amber-500 flex-shrink-0 mt-0.5" />
                   <div className="text-xs text-amber-700 dark:text-amber-300">
                     <strong>Note:</strong> Error messages never reveal the underlying service provider. If the
-                    upstream service fails, you&apos;ll see &quot;Wisee AI 1.0 service error&quot; - never a
+                    upstream service fails, you&apos;ll see &quot;Fubrio AI service error&quot; - never a
                     different provider&apos;s name.
                   </div>
                 </div>
@@ -668,9 +676,9 @@ app.post("/api/fubrio-webhook", async (req, res) => {
 
 app.listen(3000);`} />
 
-              <H3>Chatbot - Wisee AI 1.0 + your context</H3>
+              <H3>Chatbot - Fubrio AI + your context</H3>
               <P>
-                A simple CLI chatbot that uses Wisee AI 1.0 with conversation memory.
+                A simple CLI chatbot that uses Fubrio AI with conversation memory.
               </P>
               <CodeBlock lang="javascript" code={`import readline from "readline";
 
@@ -694,7 +702,7 @@ async function ask(question: string) {
   const data = await res.json();
   if (!data.ok) throw new Error(data.error);
   conversation.push({ role: "assistant", content: data.response });
-  console.log(\`Wisee AI: \${data.response}\\n\`);
+  console.log(\`Fubrio AI: \${data.response}\\n\`);
 }
 
 function prompt() {

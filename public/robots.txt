@@ -1,3 +1,7 @@
 User-agent: *
 Allow: /
 Disallow: /__fubrio_trap
+Disallow: /api/
+
+Sitemap: https://fubrio.in/sitemap.xml
+Sitemap: https://bloom.fubrio.in/sitemap.xml

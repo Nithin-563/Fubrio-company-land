@@ -286,7 +286,7 @@ export function EmployeesAdmin() {
         title="Employees"
         desc="Create and manage employee accounts. Each employee logs in via the Czer panel using their email + unique 6-digit code. Grant granular per-section + per-action permissions below."
         action={
-          <Button onClick={openCreate} className="rounded-full bg-foreground text-background hover:bg-foreground/90">
+          <Button onClick={openCreate} className="rounded-none bg-foreground text-background hover:bg-foreground/90">
             <Plus className="h-4 w-4 mr-1.5" /> New employee
           </Button>
         }
@@ -327,7 +327,7 @@ export function EmployeesAdmin() {
               return (
                 <div key={emp.id} className="p-4 hover:bg-accent/30 transition-colors">
                   <div className="flex flex-col sm:flex-row sm:items-start gap-3">
-                    <div className="flex h-10 w-10 items-center justify-center rounded-full bg-gradient-to-br from-secondary to-muted text-sm font-semibold flex-shrink-0">
+                    <div className="flex h-10 w-10 items-center justify-center rounded-none bg-gradient-to-br from-secondary to-muted text-sm font-semibold flex-shrink-0">
                       {(emp.name ?? emp.email).slice(0, 1).toUpperCase()}
                     </div>
                     <div className="min-w-0 flex-1">
@@ -380,12 +380,12 @@ export function EmployeesAdmin() {
                       )}
                     </div>
                     <div className="flex items-center gap-1.5 flex-shrink-0">
-                      <Button variant="outline" size="sm" className="rounded-full" onClick={() => openEdit(emp)}>
+                      <Button variant="outline" size="sm" className="rounded-none" onClick={() => openEdit(emp)}>
                         <Edit2 className="h-3.5 w-3.5 mr-1" /> Edit
                       </Button>
                       <DropdownMenu>
                         <DropdownMenuTrigger asChild>
-                          <Button variant="ghost" size="sm" className="rounded-full">
+                          <Button variant="ghost" size="sm" className="rounded-none">
                             Status
                           </Button>
                         </DropdownMenuTrigger>
@@ -404,7 +404,7 @@ export function EmployeesAdmin() {
                       <Button
                         variant="ghost"
                         size="sm"
-                        className="rounded-full text-destructive hover:text-destructive"
+                        className="rounded-none text-destructive hover:text-destructive"
                         onClick={() => setDeleteId(emp.id)}
                         aria-label="Delete"
                       >
@@ -468,7 +468,7 @@ export function EmployeesAdmin() {
                     type="button"
                     variant="outline"
                     size="sm"
-                    className="rounded-full"
+                    className="rounded-none"
                     onClick={() => setForm({ ...form, czerCode: genRandomCode() })}
                   >
                     <RotateCcw className="h-3.5 w-3.5 mr-1" /> Generate
@@ -491,7 +491,7 @@ export function EmployeesAdmin() {
               </Field>
             </div>
 
-            <div className="rounded-xl border border-border p-4">
+            <div className="rounded-sm border border-border p-4">
               <div className="flex items-center justify-between mb-3">
                 <div>
                   <div className="text-sm font-semibold">Section & action permissions</div>
@@ -506,7 +506,7 @@ export function EmployeesAdmin() {
                     type="button"
                     variant="outline"
                     size="sm"
-                    className="rounded-full text-[11px]"
+                    className="rounded-none text-[11px]"
                     onClick={() => {
                       const all: Record<string, string[]> = {};
                       for (const s of SECTIONS) all[s.id] = ACTIONS.map((a) => a.id);
@@ -519,7 +519,7 @@ export function EmployeesAdmin() {
                     type="button"
                     variant="outline"
                     size="sm"
-                    className="rounded-full text-[11px]"
+                    className="rounded-none text-[11px]"
                     onClick={() => setForm({ ...form, permissions: {} })}
                   >
                     Clear all
@@ -534,7 +534,7 @@ export function EmployeesAdmin() {
                     <div
                       key={s.id}
                       className={cn(
-                        "rounded-lg border p-2 transition-colors",
+                        "rounded-sm border p-2 transition-colors",
                         sectionEnabled
                           ? "border-[var(--fubrio-accent)]/40 bg-[var(--fubrio-accent-soft)]"
                           : "border-border bg-background",
@@ -637,7 +637,7 @@ function Field({ label, children }: { label: string; children: React.ReactNode }
 
 function StatChip({ icon, label, value, accent }: { icon: React.ReactNode; label: string; value: number; accent?: boolean }) {
   return (
-    <div className="rounded-xl glass-card p-4">
+    <div className="rounded-sm glass-card p-4">
       <div className="flex items-center gap-2">
         {icon}
         <div className="text-xs uppercase tracking-wider text-muted-foreground">{label}</div>

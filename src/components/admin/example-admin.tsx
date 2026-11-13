@@ -43,12 +43,12 @@ const PRESET_PROMPTS = [
 function CodeBlock({ code }: { code: string }) {
   const [copied, setCopied] = useState(false);
   return (
-    <div className="relative rounded-lg bg-secondary border border-border">
+    <div className="relative rounded-sm bg-secondary border border-border">
       <div className="absolute top-2 right-2">
         <Button
           size="icon"
           variant="ghost"
-          className="rounded-full h-7 w-7"
+          className="rounded-none h-7 w-7"
           onClick={() => {
             navigator.clipboard.writeText(code);
             setCopied(true);
@@ -167,7 +167,7 @@ export function ExampleAdmin() {
     <div>
       <SectionHeader
         title="Example"
-        desc="Live playground for the Wisee AI 1.0 API. Pick an API key, type a message, and see how the endpoint responds - including timing and token usage."
+        desc="Live playground for the AI API. Pick an API key, type a message, and see how the endpoint responds - including timing and token usage."
       />
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
@@ -291,18 +291,18 @@ export function ExampleAdmin() {
           <Card className="overflow-hidden flex flex-col h-[calc(100vh-220px)] min-h-[500px]">
             <div className="border-b border-border p-3 flex items-center justify-between gap-3">
               <div className="flex items-center gap-2">
-                <div className="flex h-8 w-8 items-center justify-center rounded-full bg-[var(--fubrio-accent-soft)] border border-[var(--fubrio-accent)]/30">
+                <div className="flex h-8 w-8 items-center justify-center rounded-none bg-[var(--fubrio-accent-soft)] border border-[var(--fubrio-accent)]/30">
                   <Bot className="h-4 w-4 text-[var(--fubrio-accent)]" />
                 </div>
                 <div>
-                  <div className="text-sm font-semibold">Wisee AI 1.0</div>
+                  <div className="text-sm font-semibold">Fubrio AI</div>
                   <div className="text-[10px] text-muted-foreground">Live playground</div>
                 </div>
               </div>
               <Button
                 size="sm"
                 variant="ghost"
-                className="rounded-full"
+                className="rounded-none"
                 onClick={() => setMessages([])}
                 title="Clear conversation"
               >
@@ -321,7 +321,7 @@ export function ExampleAdmin() {
                       <button
                         key={p}
                         onClick={() => setInput(p)}
-                        className="text-xs text-left rounded-lg border border-border bg-background p-2 hover:border-[var(--fubrio-accent)]/40 transition-colors"
+                        className="text-xs text-left rounded-sm border border-border bg-background p-2 hover:border-[var(--fubrio-accent)]/40 transition-colors"
                       >
                         {p}
                       </button>
@@ -336,7 +336,7 @@ export function ExampleAdmin() {
                   >
                     <div
                       className={cn(
-                        "max-w-[80%] rounded-2xl px-3 py-2",
+                        "max-w-[80%] rounded-none px-3 py-2",
                         m.role === "user"
                           ? "bg-[var(--fubrio-accent)] text-[var(--fubrio-accent-foreground)] rounded-br-sm"
                           : "bg-card border border-border rounded-bl-sm",
@@ -345,7 +345,7 @@ export function ExampleAdmin() {
                       {m.role === "assistant" && (
                         <div className="flex items-center gap-1 mb-1">
                           <Bot className="h-3 w-3 text-[var(--fubrio-accent)]" />
-                          <span className="text-[10px] font-medium text-muted-foreground">Wisee AI 1.0</span>
+                          <span className="text-[10px] font-medium text-muted-foreground">Fubrio AI</span>
                         </div>
                       )}
                       <div className="text-sm whitespace-pre-wrap break-words">{m.content}</div>
@@ -367,10 +367,10 @@ export function ExampleAdmin() {
               )}
               {sending && (
                 <div className="flex justify-start">
-                  <div className="rounded-2xl px-3 py-2 bg-card border border-border rounded-bl-sm">
+                  <div className="rounded-none px-3 py-2 bg-card border border-border rounded-bl-sm">
                     <div className="flex items-center gap-2">
                       <Loader2 className="h-3 w-3 animate-spin" />
-                      <span className="text-xs text-muted-foreground">Wisee AI 1.0 is typing…</span>
+                      <span className="text-xs text-muted-foreground">Fubrio AI is typing…</span>
                     </div>
                   </div>
                 </div>
@@ -389,14 +389,14 @@ export function ExampleAdmin() {
                     }
                   }}
                   rows={1}
-                  placeholder="Ask Wisee AI 1.0 anything…"
+                  placeholder="Ask Fubrio AI anything…"
                   className="flex-1 bg-background max-h-32"
                 />
                 <Button
                   size="icon"
                   onClick={send}
                   disabled={sending || !input.trim()}
-                  className="rounded-full bg-foreground text-background hover:bg-foreground/90"
+                  className="rounded-none bg-foreground text-background hover:bg-foreground/90"
                 >
                   {sending ? <Loader2 className="h-4 w-4 animate-spin" /> : <Send className="h-4 w-4" />}
                 </Button>

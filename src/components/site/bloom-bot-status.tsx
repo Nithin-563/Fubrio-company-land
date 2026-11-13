@@ -1,8 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { Bot, Server, Users, Command, Loader2, Wifi, WifiOff } from "lucide-react";
-
+import { Wifi, WifiOff } from "lucide-react";
 
 interface BotStatus {
   ok?: boolean;
@@ -33,74 +32,45 @@ export function BloomBotStatus({ fallback }: { fallback?: { servers: number; use
       })
       .catch(() => {});
 
-    fetch("/api/bloom/status")
-      .then((r) => r.json())
-      .then((data) => setStatus(data))
-      .catch(() => setStatus({ error: "unreachable" }))
-      .finally(() => setLoading(false));
-
-    const interval = setInterval(() => {
+    const load = () =>
       fetch("/api/bloom/status")
         .then((r) => r.json())
         .then((data) => setStatus(data))
-        .catch(() => {});
-    }, 60000);
+        .catch(() => setStatus({ error: "unreachable" }));
+
+    load().finally(() => setLoading(false));
+    const interval = setInterval(load, 60000);
     return () => clearInterval(interval);
   }, []);
 
-  if (loading) {
-    return (
-      <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
-        {Array.from({ length: 4 }).map((_, i) => (
-          <div key={i} className="rounded-xl glass-card p-4 animate-pulse h-24" />
-        ))}
-      </div>
-    );
-  }
-
   const bot = status?.bot;
-  const isBotLive = bot?.ready === true && !status?.error;
+  const live = bot?.ready === true && !status?.error;
 
-  const servers = isBotLive ? (bot?.guilds ?? 0) : (parseInt(settings["bloom.servers"]) || fallback?.servers || 0);
-  const users = isBotLive ? (bot?.users ?? 0) : (parseInt(settings["bloom.users"]) || fallback?.users || 0);
-  const commands = isBotLive ? (bot?.commands ?? 0) : (parseInt(settings["bloom.commands"]) || fallback?.commands || 150);
-  const online = isBotLive ? true : (settings["bloom.status"] === "online" || !settings["bloom.status"]);
+  const servers = live ? (bot?.guilds ?? 0) : (parseInt(settings["bloom.servers"]) || fallback?.servers || 0);
+  const users = live ? (bot?.users ?? 0) : (parseInt(settings["bloom.users"]) || fallback?.users || 0);
+  const commands = live ? (bot?.commands ?? 0) : (parseInt(settings["bloom.commands"]) || fallback?.commands || 150);
+  const online = live ? true : (settings["bloom.status"] === "online" || !settings["bloom.status"]);
+
+  const rows: Array<{ label: string; value: string; accent?: boolean }> = [
+    { label: "Status", value: loading ? "—" : online ? "Online" : "Offline", accent: online },
+    { label: "Servers", value: servers > 0 ? servers.toLocaleString() : "—" },
+    { label: "Members", value: users > 0 ? users.toLocaleString() : "—" },
+    { label: "Commands", value: commands > 0 ? commands.toLocaleString() : "150" },
+  ];
 
   return (
-    <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
-      <StatCard
-        icon={online ? <Wifi className="h-4 w-4 text-[var(--fubrio-accent)]" /> : <WifiOff className="h-4 w-4 text-muted-foreground" />}
-        label="Status"
-        value={online ? "Online" : "Offline"}
-        accent={online}
-      />
-      <StatCard
-        icon={<Server className="h-4 w-4" />}
-        label="Servers"
-        value={servers > 0 ? servers.toLocaleString() : "-"}
-      />
-      <StatCard
-        icon={<Users className="h-4 w-4" />}
-        label="Users"
-        value={users > 0 ? users.toLocaleString() : "-"}
-      />
-      <StatCard
-        icon={<Command className="h-4 w-4" />}
-        label="Commands"
-        value={commands > 0 ? commands.toString() : "150+"}
-      />
-    </div>
-  );
-}
-
-function StatCard({ icon, label, value, accent }: { icon: React.ReactNode; label: string; value: string; accent?: boolean }) {
-  return (
-    <div className="rounded-xl glass-card p-4">
-      <div className="flex items-center gap-2">
-        {icon}
-        <div className="text-xs uppercase tracking-wider text-muted-foreground">{label}</div>
-      </div>
-      <div className={`mt-2 font-display text-2xl font-semibold ${accent ? "text-[var(--fubrio-accent)]" : ""}`}>{value}</div>
+    <div className="border-t border-border">
+      {rows.map((r) => (
+        <div key={r.label} className="flex items-baseline justify-between border-b border-border py-2.5">
+          <span className="font-mono text-[11px] uppercase tracking-[0.14em] text-muted-foreground">
+            {r.label}
+          </span>
+          <span className={`inline-flex items-center gap-1.5 text-[0.9375rem] ${r.accent ? "text-[var(--fubrio-accent)]" : ""}`}>
+            {r.label === "Status" && (online ? <Wifi className="h-3 w-3" /> : <WifiOff className="h-3 w-3" />)}
+            {r.value}
+          </span>
+        </div>
+      ))}
     </div>
   );
 }

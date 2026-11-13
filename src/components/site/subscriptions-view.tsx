@@ -184,13 +184,13 @@ export function SubscriptionsView() {
         </p>
 
         {status !== "loading" && !session && (
-          <div className="mt-8 rounded-2xl border border-border bg-secondary/30 p-8 text-center">
+          <div className="mt-8 rounded-none border border-border bg-secondary/30 p-8 text-center">
             <Shield className="h-10 w-10 mx-auto mb-3 text-[var(--fubrio-accent)]" />
             <h2 className="font-display text-2xl font-semibold mb-2">Sign in to view plans</h2>
             <p className="text-sm text-muted-foreground mb-4 max-w-md mx-auto">
               Subscriptions require Google authentication. This prevents abuse and ties purchases to your Google account.
             </p>
-            <Button onClick={() => signIn("google", { callbackUrl: `${window.location.origin}/#subscriptions` })} className="rounded-full bg-foreground text-background hover:bg-foreground/90">
+            <Button onClick={() => signIn("google", { callbackUrl: `${window.location.origin}/#subscriptions` })} className="rounded-none bg-foreground text-background hover:bg-foreground/90">
               <Shield className="h-4 w-4 mr-2" />
               Sign in with Google
             </Button>
@@ -198,22 +198,22 @@ export function SubscriptionsView() {
         )}
 
         {status === "authenticated" && !isGoogleAuth && (
-          <div className="mt-8 rounded-2xl border border-amber-500/40 bg-amber-500/10 p-6 text-center">
+          <div className="mt-8 rounded-none border border-amber-500/40 bg-amber-500/10 p-6 text-center">
             <Shield className="h-8 w-8 mx-auto mb-2 text-amber-500" />
             <h2 className="font-display text-xl font-semibold mb-1">Google authentication required</h2>
             <p className="text-sm text-muted-foreground mb-3">
               You&apos;re signed in via <code>{authProvider}</code>. Sign out and sign back in with Google to subscribe.
             </p>
-            <Button onClick={() => signIn("google", { callbackUrl: `${window.location.origin}/#subscriptions` })} className="rounded-full">
+            <Button onClick={() => signIn("google", { callbackUrl: `${window.location.origin}/#subscriptions` })} className="rounded-none">
               Sign in with Google
             </Button>
           </div>
         )}
 
         {activeSub && (
-          <div className="mt-6 rounded-2xl border border-[var(--fubrio-accent)]/40 bg-[var(--fubrio-accent-soft)] p-5 flex items-center justify-between gap-3">
+          <div className="mt-6 rounded-none border border-[var(--fubrio-accent)]/40 bg-[var(--fubrio-accent-soft)] p-5 flex items-center justify-between gap-3">
             <div className="flex items-center gap-3">
-              <div className="flex h-10 w-10 items-center justify-center rounded-full bg-[var(--fubrio-accent)] text-[var(--fubrio-accent-foreground)]">
+              <div className="flex h-10 w-10 items-center justify-center rounded-none bg-[var(--fubrio-accent)] text-[var(--fubrio-accent-foreground)]">
                 <Check className="h-5 w-5" />
               </div>
               <div>
@@ -226,7 +226,7 @@ export function SubscriptionsView() {
             <Button
               variant="outline"
               size="sm"
-              className="rounded-full"
+              className="rounded-none"
               onClick={() => navigate("#api-keys")}
             >
               Manage API keys
@@ -238,10 +238,10 @@ export function SubscriptionsView() {
           <>
             {loading ? (
               <div className="mt-8 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
-                {Array.from({ length: 3 }).map((_, i) => <Skeleton key={i} className="h-72 rounded-xl" />)}
+                {Array.from({ length: 3 }).map((_, i) => <Skeleton key={i} className="h-72 rounded-sm" />)}
               </div>
             ) : plans.length === 0 ? (
-              <div className="mt-8 rounded-xl border border-dashed border-border p-12 text-center">
+              <div className="mt-8 rounded-sm border border-dashed border-border p-12 text-center">
                 <Crown className="h-8 w-8 mx-auto mb-2 opacity-50" />
                 <div className="font-display text-lg font-semibold">No subscription plans available yet</div>
                 <div className="mt-1 text-sm text-muted-foreground">Check back soon - we&apos;re setting up plans.</div>
@@ -254,7 +254,7 @@ export function SubscriptionsView() {
                     <div
                       key={plan.id}
                       className={cn(
-                        "rounded-2xl border bg-card overflow-hidden flex flex-col",
+                        "rounded-none border bg-card overflow-hidden flex flex-col",
                         plan.order === 0 ? "border-[var(--fubrio-accent)]/40 shadow-lg" : "border-border",
                       )}
                     >
@@ -279,7 +279,7 @@ export function SubscriptionsView() {
                         <ul className="space-y-1.5 mb-5 flex-1">
                           <li className="text-xs flex items-start gap-2">
                             <Sparkles className="h-3.5 w-3.5 text-[var(--fubrio-accent)] mt-0.5 flex-shrink-0" />
-                            <span><strong>{plan.aiCreditsPerDay}</strong> Wisee AI requests per day</span>
+                            <span><strong>{plan.aiCreditsPerDay}</strong> Fubrio AI requests per day</span>
                           </li>
                           <li className="text-xs flex items-start gap-2">
                             <Megaphone className="h-3.5 w-3.5 text-[var(--fubrio-accent)] mt-0.5 flex-shrink-0" />
@@ -301,7 +301,7 @@ export function SubscriptionsView() {
                             disabled={isCurrent || !!payingFor}
                             onClick={() => startPayment(plan)}
                             className={cn(
-                              "w-full rounded-full",
+                              "w-full rounded-none",
                               plan.order === 0
                                 ? "bg-foreground text-background hover:bg-foreground/90"
                                 : "bg-foreground text-background hover:bg-foreground/90",
@@ -317,7 +317,7 @@ export function SubscriptionsView() {
                           <Button
                             variant="outline"
                             size="sm"
-                            className="w-full rounded-full text-[11px]"
+                            className="w-full rounded-none text-[11px]"
                             onClick={() => setShowPriceRequest(plan)}
                           >
                             <MessageCircle className="h-3 w-3 mr-1" /> Request custom price

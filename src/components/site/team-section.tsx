@@ -1,7 +1,8 @@
 "use client";
 
-import { Users, Linkedin, Mail, Globe, ArrowUpRight } from "lucide-react";
+import { ArrowUpRight } from "lucide-react";
 import { navigate } from "@/lib/router";
+import { ChapterHead, Meta } from "@/components/site/editorial";
 
 interface TeamMember {
   id: string;
@@ -19,99 +20,104 @@ interface TeamMember {
 
 export function TeamSection({ members }: { members: TeamMember[] }) {
   if (!members || members.length === 0) return null;
-  return (
-    <section className="py-24 sm:py-32" id="team">
-      <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-        <div className="text-center max-w-3xl mx-auto mb-16">
-          <div className="text-xs uppercase tracking-wider text-[var(--fubrio-accent)] font-semibold flex items-center justify-center gap-2">
-            <Users className="h-3.5 w-3.5" />
-            Our Team
-          </div>
-          <h2 className="display-heading mt-3 text-4xl sm:text-5xl">
-            The people behind Fubrio.
-          </h2>
-          <p className="mt-4 text-muted-foreground text-base sm:text-lg">
-            A distributed team of engineers, designers, and creators building the future of digital experiences.
-          </p>
-        </div>
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 stagger-children">
+  return (
+    <section className="py-16 sm:py-20" id="team">
+      <div className="mx-auto max-w-[84rem] px-4 sm:px-6 lg:px-8">
+        <ChapterHead
+          index="06"
+          label="Studio"
+          title="A few people, a lot of tabs open."
+          description="No account managers, no handoff layer. The people who scope the work are the people who build it."
+          action={
+            <button onClick={() => navigate("#contact")} className="link-arrow text-foreground">
+              Work with us <ArrowUpRight className="h-3.5 w-3.5" />
+            </button>
+          }
+        />
+
+        <div className="mt-8 grid gap-x-8 gap-y-10 sm:grid-cols-2 lg:grid-cols-3">
           {members.map((m) => (
-            <div
-              key={m.id}
-              className="group relative rounded-3xl glass-card p-6 transition-all hover:-translate-y-1"
-            >
-              <div className="relative w-24 h-24 mx-auto mb-5">
-                <div className="absolute inset-0 rounded-full bg-gradient-to-br from-[var(--fubrio-accent)]/30 to-transparent blur-xl group-hover:blur-2xl transition-all" />
+            <div key={m.id} className="group">
+              <div className="relative aspect-[4/5] w-full overflow-hidden border border-border bg-muted">
                 {m.photo ? (
-                   
                   <img
                     src={m.photo}
                     alt={m.name}
-                    className="relative w-24 h-24 rounded-full object-cover border-2 border-[var(--fubrio-accent)]/30"
+                    width={600}
+                    height={750}
+                    loading="lazy"
+                    decoding="async"
+                    className="absolute inset-0 h-full w-full object-cover grayscale-[0.35] transition duration-500 group-hover:grayscale-0"
                   />
                 ) : (
-                  <div className="relative w-24 h-24 rounded-full bg-gradient-to-br from-secondary to-muted border-2 border-[var(--fubrio-accent)]/30 flex items-center justify-center text-2xl font-display font-semibold">
-                    {m.name.split(" ").map((n) => n[0]).join("").slice(0, 2)}
+                  <div className="absolute inset-0 flex items-center justify-center">
+                    <span className="font-display text-[3rem] text-muted-foreground/40">
+                      {m.name
+                        .split(" ")
+                        .map((n) => n[0])
+                        .join("")
+                        .slice(0, 2)}
+                    </span>
                   </div>
                 )}
               </div>
 
-              <div className="text-center">
-                <h3 className="font-display text-lg font-semibold">{m.name}</h3>
-                <div className="text-xs uppercase tracking-wider text-[var(--fubrio-accent)] font-medium mt-1">
-                  {m.role}
-                </div>
-                {m.bio && (
-                  <p className="mt-3 text-sm text-muted-foreground line-clamp-3">{m.bio}</p>
-                )}
+              <div className="mt-3 flex items-baseline justify-between gap-3 border-t border-border pt-2.5">
+                <h3 className="font-display text-[1.3rem] leading-tight">{m.name}</h3>
+                <Meta className="text-right">{m.role}</Meta>
               </div>
 
-              <div className="mt-4 flex items-center justify-center gap-2">
-                {m.linkedin && (
-                  <a
-                    href={m.linkedin}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="flex h-9 w-9 items-center justify-center rounded-full glass-card hover:border-[var(--fubrio-accent)]/40 transition-colors"
-                    aria-label={`${m.name} on LinkedIn`}
-                  >
-                    <Linkedin className="h-4 w-4" />
-                  </a>
-                )}
-                {m.email && (
-                  <a
-                    href={`mailto:${m.email}`}
-                    className="flex h-9 w-9 items-center justify-center rounded-full glass-card hover:border-[var(--fubrio-accent)]/40 transition-colors"
-                    aria-label={`Email ${m.name}`}
-                  >
-                    <Mail className="h-4 w-4" />
-                  </a>
-                )}
-                {m.website && (
-                  <a
-                    href={m.website}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="flex h-9 w-9 items-center justify-center rounded-full glass-card hover:border-[var(--fubrio-accent)]/40 transition-colors"
-                    aria-label={`${m.name}'s website`}
-                  >
-                    <Globe className="h-4 w-4" />
-                  </a>
-                )}
-              </div>
+              {m.bio && (
+                <p className="mt-2 line-clamp-3 text-[13px] leading-relaxed text-muted-foreground">
+                  {m.bio}
+                </p>
+              )}
+
+              {(m.linkedin || m.email || m.website || m.github || m.twitter) && (
+                <div className="mt-2 flex flex-wrap gap-x-3 gap-y-1">
+                  {m.linkedin && (
+                    <a
+                      href={m.linkedin}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="font-mono text-[10px] uppercase tracking-[0.1em] text-muted-foreground underline-offset-4 hover:text-foreground hover:underline"
+                    >
+                      LinkedIn
+                    </a>
+                  )}
+                  {m.email && (
+                    <a
+                      href={`mailto:${m.email}`}
+                      className="font-mono text-[10px] uppercase tracking-[0.1em] text-muted-foreground underline-offset-4 hover:text-foreground hover:underline"
+                    >
+                      Email
+                    </a>
+                  )}
+                  {m.website && (
+                    <a
+                      href={m.website}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="font-mono text-[10px] uppercase tracking-[0.1em] text-muted-foreground underline-offset-4 hover:text-foreground hover:underline"
+                    >
+                      Site
+                    </a>
+                  )}
+                  {m.github && (
+                    <a
+                      href={m.github}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="font-mono text-[10px] uppercase tracking-[0.1em] text-muted-foreground underline-offset-4 hover:text-foreground hover:underline"
+                    >
+                      GitHub
+                    </a>
+                  )}
+                </div>
+              )}
             </div>
           ))}
-        </div>
-
-        <div className="mt-12 text-center">
-          <button
-            onClick={() => navigate("#contact")}
-            className="inline-flex items-center gap-1.5 rounded-full border border-border px-5 py-2.5 text-sm font-medium hover:bg-accent transition-colors group"
-          >
-            Join our team
-            <ArrowUpRight className="h-4 w-4 transition-transform group-hover:translate-x-0.5" />
-          </button>
         </div>
       </div>
     </section>

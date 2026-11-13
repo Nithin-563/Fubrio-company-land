@@ -104,24 +104,23 @@ export function DonationBanner() {
 
   return (
     <>
-      <div className="relative z-50 glass-strong border-b border-[var(--fubrio-accent)]/30 animate-fade-in">
-        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-          <div className="flex items-center justify-center gap-3 py-2.5 text-sm relative">
-            <Heart className="h-4 w-4 text-[var(--fubrio-accent)] flex-shrink-0" />
-            <span className="text-muted-foreground">
+      <div className="relative z-50 border-b border-border bg-[var(--fubrio-accent-soft)]">
+        <div className="mx-auto max-w-[84rem] px-4 sm:px-6 lg:px-8">
+          <div className="relative flex items-center justify-center gap-3 py-1.5">
+            <span className="font-mono text-[10px] uppercase tracking-[0.1em] text-foreground/80">
               {config.text || "Support Fubrio"}
             </span>
             <button
               onClick={onDonateClick}
               disabled={loadingPicker}
-              className="inline-flex items-center gap-1 rounded-full bg-[var(--fubrio-accent)] text-[var(--fubrio-accent-foreground)] px-3 py-1 text-xs font-medium hover:opacity-90 transition-opacity disabled:opacity-70"
+              className="inline-flex items-center gap-1 border border-foreground/30 px-2 py-0.5 font-mono text-[10px] uppercase tracking-[0.08em] text-foreground transition-colors hover:border-foreground disabled:opacity-70"
             >
               {loadingPicker ? <Loader2 className="h-3 w-3 animate-spin" /> : <Heart className="h-3 w-3" />}
               Donate
             </button>
             <button
               onClick={dismiss}
-              className="absolute right-4 text-muted-foreground hover:text-foreground"
+              className="absolute right-0 text-muted-foreground transition-colors hover:text-foreground"
               aria-label="Dismiss"
             >
               <X className="h-3.5 w-3.5" />
@@ -131,14 +130,14 @@ export function DonationBanner() {
       </div>
 
       <Dialog open={pickerOpen} onOpenChange={(o) => !o && setPickerOpen(false)}>
-        <DialogContent className="max-w-md">
+        <DialogContent className="max-w-md rounded-none border-border">
           <DialogHeader>
-            <DialogTitle className="flex items-center gap-2">
+            <DialogTitle className="flex items-center gap-2 font-display text-2xl font-normal">
               <Heart className="h-4 w-4 text-[var(--fubrio-accent)]" />
-              Choose where to donate
+              Where should it go?
             </DialogTitle>
             <DialogDescription>
-              Fubrio accepts donations through multiple platforms. Pick the one you prefer - every bit helps.
+              Donations are handled by the platforms below. Pick whichever is easiest for you.
             </DialogDescription>
           </DialogHeader>
           <div className="py-2 space-y-2">
@@ -151,9 +150,9 @@ export function DonationBanner() {
                   target="_blank"
                   rel="noopener noreferrer"
                   onClick={() => setPickerOpen(false)}
-                  className="flex items-center gap-3 rounded-xl border border-border bg-card p-3 hover:border-[var(--fubrio-accent)]/40 hover:bg-[var(--fubrio-accent-soft)] transition-all group"
+                  className="group flex items-center gap-3 border border-border bg-card p-3 transition-colors hover:border-foreground"
                 >
-                  <div className="flex h-9 w-9 items-center justify-center rounded-full bg-[var(--fubrio-accent-soft)] border border-[var(--fubrio-accent)]/30 text-base">
+                  <div className="flex h-8 w-8 items-center justify-center border border-border text-sm">
                     {emoji}
                   </div>
                   <div className="min-w-0 flex-1">

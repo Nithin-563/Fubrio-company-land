@@ -181,7 +181,7 @@ export function CrudTable<T extends { id: string }>({
         title={title}
         desc={description}
         action={effCanCreate && (
-          <Button onClick={handleNew} className="rounded-full bg-foreground text-background hover:bg-foreground/90">
+          <Button onClick={handleNew} className="rounded-none bg-foreground text-background hover:bg-foreground/90">
             <Plus className="h-4 w-4 mr-1.5" /> New
           </Button>
         )}
@@ -232,7 +232,7 @@ export function CrudTable<T extends { id: string }>({
                     <td className="px-4 py-3 text-right">
                       <DropdownMenu>
                         <DropdownMenuTrigger asChild>
-                          <Button variant="ghost" size="icon" className="rounded-full h-7 w-7">
+                          <Button variant="ghost" size="icon" className="rounded-none h-7 w-7">
                             <MoreHorizontal className="h-4 w-4" />
                           </Button>
                         </DropdownMenuTrigger>
@@ -344,7 +344,7 @@ export function StatusBadge({ status }: { status: string }) {
     BRONZE: "bg-orange-300/30 text-orange-700 border-orange-500",
   };
   return (
-    <span className={cn("inline-flex items-center rounded-full border px-2 py-0.5 text-[10px] font-medium", colors[status] ?? colors.DRAFT)}>
+    <span className={cn("inline-flex items-center rounded-none border px-2 py-0.5 text-[10px] font-medium", colors[status] ?? colors.DRAFT)}>
       {status}
     </span>
   );
