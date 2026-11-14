@@ -162,54 +162,20 @@ NEXTAUTH_URL=http://localhost:3000`}</pre>
     settings: settingsRows,
   };
 
-  if (errors.length === 17) {
-    return (
-      <div className="min-h-screen flex items-center justify-center px-4 py-12 bg-background text-foreground">
-        <div className="max-w-2xl w-full">
-          <div className="text-center mb-8">
-            <div className="font-display text-4xl font-bold mb-3">Fubrio</div>
-            <h1 className="font-display text-2xl font-semibold mb-2">Database connection failed</h1>
-            <p className="text-muted-foreground">
-              All queries failed. Here are the errors:
-            </p>
-          </div>
-          <div className="rounded-xl border border-border bg-card p-5 mb-6 space-y-3">
-            {errors.map((e, i) => (
-              <div key={i} className="text-xs font-mono text-destructive whitespace-pre-wrap break-all border-b border-border last:border-0 pb-2 last:pb-0">
-                {e}
-              </div>
-            ))}
-          </div>
-          <div className="text-left rounded-xl border border-border bg-card p-5 space-y-4 text-sm">
-            <div className="pl-3 border-l-2 border-border">
-              <div className="font-medium">Most likely causes:</div>
-              <div className="text-muted-foreground mt-1">
-                <div>1. Tables not created - run <code className="font-mono text-xs bg-secondary px-1.5 py-0.5 rounded">supabase/schema.sql</code> in Supabase SQL Editor</div>
-                <div>2. RLS blocking reads - the schema.sql now includes RLS policies, re-run it</div>
-                <div>3. Wrong anon key - must be the <strong>anon public</strong> key, not service_role</div>
-                <div>4. Tables are empty - run <code className="font-mono text-xs bg-secondary px-1.5 py-0.5 rounded">bun run seed</code> locally</div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-    );
+  if (errors.length > 0) {
+    console.error(`[fubrio] ${errors.length} homepage queries failed:`, errors.join(" | "));
   }
 
-  if (errors.length > 0) {
-    return (
-      <div>
-        <div className="bg-amber-500/10 border-b border-amber-500/30 px-4 py-2 text-xs text-amber-600 dark:text-amber-400">
-          ⚠ {errors.length} query(ies) failed: {errors.join("; ").slice(0, 200)}...
-        </div>
-        <PageClient data={data} />
-      </div>
-    );
-  }
+  const showDiagnostics = process.env.NODE_ENV !== "production";
 
   return (
     <>
       {brandStyle}
+      {showDiagnostics && errors.length > 0 && (
+        <div className="border-b border-amber-500/30 bg-amber-500/10 px-4 py-2 text-xs text-amber-600 dark:text-amber-400">
+          ⚠ {errors.length} queries failed (development only): {errors.join("; ").slice(0, 300)}
+        </div>
+      )}
       <PageClient data={data} brandId={brandId} />
     </>
   );

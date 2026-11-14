@@ -32,7 +32,7 @@ function parseJSON<T>(value: string | null, fallback: T): T {
 
 export async function getFeaturedProjects(limit = 6, brand?: string) {
   const where: Record<string, unknown> = { status: "LIVE", visibility: "PUBLIC" };
-  if (brand) where.brand = { in: [brand, "both"] };
+  if (brand === "bloom") where.brand = { in: ["bloom", "both"] };
   const rows = await db.project.findMany({
     where,
     include: { category: true, tags: true, author: true },
