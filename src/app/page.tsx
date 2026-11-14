@@ -8,6 +8,7 @@ import { isSupabaseConfigured } from "@/lib/supabase";
 import { db } from "@/lib/db";
 import { detectBrand, getBrandConfig } from "@/lib/brand";
 import { isPublicSettingKey } from "@/lib/ai-config";
+import { FALLBACK_PROJECTS, FALLBACK_TEAM, fallbackFaqs, fallbackPosts } from "@/lib/fallback-content";
 import { headers } from "next/headers";
 import { FubFindzStore } from "@/components/fubfindz-store";
 
@@ -161,6 +162,39 @@ NEXTAUTH_URL=http://localhost:3000`}</pre>
     footerColumns, categories, pages, teamMembers, donators, shopItems,
     settings: settingsRows,
   };
+
+  data.projects = data.projects?.length ? data.projects : FALLBACK_PROJECTS;
+  data.posts = data.posts?.length ? data.posts : fallbackPosts(brandId);
+  data.faqs = data.faqs?.length ? data.faqs : fallbackFaqs(brandId);
+  data.teamMembers = data.teamMembers?.length ? data.teamMembers : FALLBACK_TEAM;
+  data.products = data.products?.length ? data.products : FALLBACK_PROJECTS.map((p) => ({
+    id: `prod-${p.id}`,
+    title: p.title,
+    slug: p.slug,
+    shortDesc: p.shortDesc,
+    fullDesc: p.fullDesc,
+    thumbnail: null,
+    coverImage: null,
+    gallery: [],
+    features: [],
+    demoUrl: p.demoUrl,
+    documentation: null,
+    version: "1.0",
+    changelog: null,
+    requirements: null,
+    price: 0,
+    currency: "USD",
+    isFree: true,
+    status: "PUBLISHED",
+    featured: p.featured,
+    technologies: p.technologies,
+    categoryId: null,
+    publishedAt: p.publishedAt,
+    order: p.order,
+    brand: brandId,
+    category: null,
+    tags: [],
+  }));
 
   if (errors.length > 0) {
     console.error(`[fubrio] ${errors.length} homepage queries failed:`, errors.join(" | "));

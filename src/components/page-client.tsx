@@ -337,6 +337,39 @@ function HomeView({ data, brand }: { data: PageData; brand: BrandConfig }) {
       <Testimonials testimonials={data.testimonials} />
       <DonatorsSection donators={data.donators} />
       <BlogPreview posts={data.posts} />
+      {data.faqs && data.faqs.length > 0 && (
+        <section className="border-t border-border">
+          <div className="mx-auto max-w-[84rem] px-4 py-16 sm:px-6 lg:px-8">
+            <div className="grid gap-10 lg:grid-cols-12">
+              <div className="lg:col-span-4">
+                <div className="eyebrow">07 — Questions</div>
+                <h2 className="display-heading mt-2 text-[2rem] leading-tight sm:text-[2.5rem]">
+                  Answers before you ask.
+                </h2>
+                <p className="mt-3 max-w-sm text-[0.9375rem] leading-relaxed text-muted-foreground">
+                  Pricing, timelines, ownership and how the products are supported. The full list
+                  lives on the FAQ page.
+                </p>
+                <button onClick={() => navigate("#faq")} className="link-arrow mt-4 text-muted-foreground">
+                  All questions <ArrowUpRight className="h-3.5 w-3.5" />
+                </button>
+              </div>
+
+              <div className="lg:col-span-8 lg:border-l lg:border-border lg:pl-12">
+                <dl className="border-t border-border">
+                  {data.faqs.slice(0, 6).map((faq) => (
+                    <div key={faq.id} className="border-b border-border py-4">
+                      <dt className="text-[0.9375rem]">{faq.question}</dt>
+                      <dd className="mt-1.5 text-[13px] leading-relaxed text-muted-foreground">{faq.answer}</dd>
+                    </div>
+                  ))}
+                </dl>
+              </div>
+            </div>
+          </div>
+        </section>
+      )}
+
       <ContactCTA settings={data.settings} />
     </>
   );
