@@ -59,7 +59,8 @@ export function Navbar({ onOpenSearch, brand = FUBRIO_CONFIG }: { onOpenSearch: 
     ...g,
     items: g.keys
       .map((k) => secondary.find((s) => s.label === k))
-      .filter((s): s is { label: string; href: string } => Boolean(s)),
+      .filter((s): s is { label: string; href: string } => Boolean(s))
+      .filter((s) => !tabs.some((tab) => tab.href === s.href)),
   })).filter((g) => g.items.length > 0);
 
   return (

@@ -2,7 +2,6 @@
 
 import { ArrowUpRight, ArrowRight } from "lucide-react";
 import { navigate } from "@/lib/router";
-import { GradientPlaceholder, usableImage } from "@/components/shared/gradient";
 import { Meta } from "@/components/site/editorial";
 import type { SerializedProject, SerializedMetric } from "@/lib/types";
 
@@ -13,7 +12,7 @@ export function Hero({
   projects: SerializedProject[];
   metrics: SerializedMetric[];
 }) {
-  const featured = projects.find((p) => p.featured) ?? projects[0];
+  const listed = projects.slice(0, 3);
 
   return (
     <section className="relative border-b border-border" id="home">
@@ -67,66 +66,55 @@ export function Hero({
             )}
           </div>
 
-          {featured ? (
-            <div className="lg:col-span-5">
-              <div className="flex items-baseline justify-between border-b border-border pb-2">
-                <Meta>Plate 001 — Selected work</Meta>
-                <Meta>{featured.status}</Meta>
-              </div>
-
-              <button
-                onClick={() => navigate(`#showcase/${featured.slug}`)}
-                className="group mt-3 block w-full text-left focus-premium"
-              >
-                <div className="relative aspect-[4/3] w-full overflow-hidden border border-border bg-muted">
-                  {usableImage(featured.coverImage) ? (
-                    <img
-                      src={featured.coverImage as string}
-                      alt={featured.title}
-                      width={800}
-                      height={600}
-                      className="absolute inset-0 h-full w-full object-cover transition-transform duration-700 group-hover:scale-[1.03]"
-                    />
-                  ) : (
-                    <GradientPlaceholder
-                      seed={featured.title}
-                      label={featured.category?.name}
-                      className="absolute inset-0"
-                      size="xl"
-                    />
-                  )}
-                </div>
-
-                <div className="mt-4 flex items-start justify-between gap-4">
-                  <div className="min-w-0">
-                    <h2 className="font-display text-[1.6rem] leading-tight">{featured.title}</h2>
-                    <p className="mt-1 line-clamp-2 text-sm leading-relaxed text-muted-foreground">
-                      {featured.shortDesc}
-                    </p>
-                  </div>
-                  <ArrowUpRight className="mt-1 h-4 w-4 shrink-0 text-muted-foreground transition-transform group-hover:-translate-y-0.5 group-hover:translate-x-0.5" />
-                </div>
-              </button>
-
-              <div className="mt-4 flex flex-wrap items-center gap-x-3 gap-y-1 border-t border-border pt-3">
-                {featured.category && <Meta>{featured.category.name}</Meta>}
-                {featured.technologies.slice(0, 4).map((t) => (
-                  <Meta key={t} className="text-muted-foreground/70">
-                    {t}
-                  </Meta>
-                ))}
-              </div>
+          <div className="lg:col-span-5">
+            <div className="flex items-baseline justify-between border-b border-border pb-2">
+              <Meta>Selected work</Meta>
+              <Meta>{projects.length > 0 ? `${String(projects.length).padStart(2, "0")} live` : "Studio"}</Meta>
             </div>
-          ) : (
-            <div className="lg:col-span-5">
-              <div className="flex h-full min-h-[16rem] flex-col justify-between border border-border p-6">
+
+            {listed.length > 0 ? (
+              <ul className="ruled-list">
+                {listed.map((p, i) => (
+                  <li key={p.id}>
+                    <button
+                      onClick={() => navigate(`#showcase/${p.slug}`)}
+                      className="group grid w-full grid-cols-[2.25rem_1fr_auto] items-baseline gap-3 py-4 text-left"
+                    >
+                      <span className="font-mono text-[11px] text-muted-foreground">
+                        {String(i + 1).padStart(3, "0")}
+                      </span>
+                      <span className="min-w-0">
+                        <span className="flex flex-wrap items-baseline gap-x-2">
+                          <span className="font-display text-[1.4rem] leading-tight transition-colors group-hover:text-[var(--fubrio-accent)]">
+                            {p.title}
+                          </span>
+                          <Meta>{p.status}</Meta>
+                        </span>
+                        <span className="mt-0.5 line-clamp-1 block text-[13px] text-muted-foreground">
+                          {p.shortDesc}
+                        </span>
+                      </span>
+                      <ArrowUpRight className="h-4 w-4 text-muted-foreground transition-transform group-hover:-translate-y-0.5 group-hover:translate-x-0.5" />
+                    </button>
+                  </li>
+                ))}
+              </ul>
+            ) : (
+              <div className="mt-4 border border-border p-6">
                 <Meta>Studio notebook</Meta>
-                <p className="font-display text-2xl leading-snug">
+                <p className="mt-3 font-display text-xl leading-snug">
                   New work is being photographed and written up. Check back shortly.
                 </p>
               </div>
+            )}
+
+            <div className="mt-4 flex items-center justify-between border-t border-border pt-3">
+              <Meta>Since 2024</Meta>
+              <button onClick={() => navigate("#showcase")} className="link-arrow text-muted-foreground">
+                All work <ArrowUpRight className="h-3.5 w-3.5" />
+              </button>
             </div>
-          )}
+          </div>
         </div>
       </div>
     </section>

@@ -59,6 +59,7 @@ export const FUBRIO_CONFIG: BrandConfig = {
   ],
   secondaryNavItems: [
     { label: "About", href: "#about" },
+    { label: "Blog", href: "#blog" },
     { label: "Sponsors", href: "#sponsors" },
     { label: "FAQ", href: "#faq" },
     { label: "Announcements", href: "#announcements" },

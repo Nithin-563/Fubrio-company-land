@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useSession, signOut } from "next-auth/react";
 import {
   LayoutDashboard, FolderKanban, Package, Wrench, Sparkles, Handshake,
@@ -74,6 +74,20 @@ interface Props {
 export function AdminShell({ active, onChange, children }: Props) {
   const { data: session, status } = useSession();
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [writeBlocked, setWriteBlocked] = useState(false);
+
+  useEffect(() => {
+    let alive = true;
+    fetch("/api/admin/diagnostics")
+      .then((r) => r.json())
+      .then((json) => {
+        if (alive && json?.ok) setWriteBlocked(json.writesEnabled === false);
+      })
+      .catch(() => {});
+    return () => {
+      alive = false;
+    };
+  }, []);
   const role = (session?.user as { role?: string } | undefined)?.role ?? "CONTRIBUTOR";
   const permissions = (session?.user as { permissions?: EmployeePermissions } | undefined)?.permissions;
 
@@ -211,6 +225,20 @@ export function AdminShell({ active, onChange, children }: Props) {
 
         <main className="flex-1 min-w-0">
           <div className="px-4 py-6 sm:px-6 sm:py-8 lg:px-10 lg:py-10">
+            {writeBlocked && (
+              <div className="mb-6 border border-[var(--fubrio-accent)]/40 bg-[var(--fubrio-accent-soft)] px-4 py-3">
+                <div className="font-mono text-[10px] uppercase tracking-[0.14em] text-[var(--fubrio-accent)]">
+                  Database writes are blocked
+                </div>
+                <p className="mt-1 text-[13px] leading-relaxed text-muted-foreground">
+                  This deployment has no server key, so Supabase rejects every save, delete and
+                  analytics read with <span className="font-mono">permission denied</span>. Add
+                  <span className="font-mono"> SUPABASE_SERVICE_ROLE_KEY </span>
+                  to the site&apos;s environment variables and redeploy. Nothing you change here will
+                  stick until then.
+                </p>
+              </div>
+            )}
             {isActiveAllowed ? children : (
               <div className="border border-dashed border-border px-6 py-16 text-center">
                 <p className="text-sm text-muted-foreground">
